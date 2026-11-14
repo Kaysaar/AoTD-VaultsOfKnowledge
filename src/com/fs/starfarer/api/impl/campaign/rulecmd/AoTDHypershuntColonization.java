@@ -1,0 +1,163 @@
+package com.fs.starfarer.api.impl.campaign.rulecmd;
+
+import com.fs.starfarer.api.EveryFrameScript;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.SectorAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.econ.Industry;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.impl.campaign.submarkets.StoragePlugin;
+import com.fs.starfarer.api.util.Misc;
+import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.BaseColonyDevelopment;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentCondition;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentManager;
+import data.kaysaar.aotd.vok.campaign.econ.industry.coronaltap.*;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.MegastructureSpecManager;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.CoronalHypershuntMegastructure;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.models.BaseMegastructureScript;
+
+import java.util.List;
+import java.util.Map;
+
+public class AoTDHypershuntColonization extends BaseCommandPlugin{
+    @Override
+    public boolean execute(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
+        if(dialog==null)return false;
+        String arg = params.get(0).getString(memoryMap);
+        MarketAPI m = createCoronalColony(Global.getSector(),Factions.PLAYER,dialog.getInteractionTarget(),arg);
+        m.removeSubmarket(Submarkets.SUBMARKET_OPEN);
+        m.removeSubmarket(Submarkets.SUBMARKET_BLACK);
+        m.setFactionId(Factions.PLAYER);
+        dialog.getInteractionTarget().removeTag("salvageable");
+        dialog.getInteractionTarget().addTag("station");
+        Global.getSector().getPlayerFleet().getCargo().removeCommodity(Commodities.CREW,100);
+        Global.getSector().getPlayerFleet().getCargo().removeCommodity(Commodities.HEAVY_MACHINERY,1500);
+        dialog.getInteractionTarget().setFaction(Factions.PLAYER);
+        SectorEntityToken e = m.getPrimaryEntity();
+        e.setFaction(Factions.PLAYER);
+        m.addSubmarket(Submarkets.LOCAL_RESOURCES);
+        m.setPlayerOwned(true);
+        m.addTag(Tags.MARKET_NO_INDUSTRIES_ALLOWED);
+        m.setAdmin(Global.getSector().getPlayerPerson());
+        m.addCondition(BaseColonyDevelopment.condIdApplier);
+        ColonyDevelopmentCondition cond = (ColonyDevelopmentCondition) m.getCondition(BaseColonyDevelopment.condIdApplier).getPlugin();
+        cond.setIdOfDevelopment("hypershunt");
+        if(!Misc.isPlayerFactionSetUp())Global.getSector().addScript(new EveryFrameScript() {
+            @Override
+            public boolean isDone() {
+                return false;
+            }
+
+            @Override
+            public boolean runWhilePaused() {
+                return false;
+            }
+
+            @Override
+            public void advance(float amount) {
+                if(Global.getSector().getCampaignUI().showPlayerFactionConfigDialog())Global.getSector().removeScript(this);
+            }
+        });
+        Misc.stopPlayerFleet();
+        dialog.dismiss();
+       return true;
+    }
+    public  MarketAPI createCoronalColony(SectorAPI sector, String factionId, final SectorEntityToken entity,String command) {
+        MarketAPI market;
+        if(factionId == null)factionId = Factions.INDEPENDENT;
+        entity.getMemoryWithoutUpdate().unset("$abandoned");
+        market = Global.getFactory().createMarket(Misc.genUID(), "Coronal Network Center", 3);
+        if(BaseMegastructureScript.getInstanceOfScriptFromEntityIfPresent(entity,"coronal_hypershunt")==null){
+            BaseMegastructureScript script = MegastructureSpecManager.getSpecForMegastructure("coronal_hypershunt").getScript();
+            script.trueInit("coronal_hypershunt",entity,market);
+        }
+        else{
+           BaseMegastructureScript script =  BaseMegastructureScript.getInstanceOfScriptFromEntityIfPresent(entity,"coronal_hypershunt");
+           script.tiedMarket = market;
+
+        }
+        market.getMemoryWithoutUpdate().set(MemFlags.STATION_MARKET,true);
+        market.setSurveyLevel(MarketAPI.SurveyLevel.FULL);
+        market.setFactionId(factionId);
+        market.setSize(2);
+        market.addCondition("aotd_coronal_market_cond");
+        market.addTag("aotd_hypershunt");
+        market.getStats().getDynamic().getMod(
+                Stats.MAX_MARKET_SIZE).modifyFlat("aotd_correction",-Misc.getMaxMarketSize(market)+2,"Coronal Hypershunt");
+        market.addCondition(Conditions.POPULATION_2);//a few thousand homies in a boat
+        market.addIndustry("aotd_coronal_control");
+        market.addIndustry(Industries.MEGAPORT);
+        market.getIndustry(Industries.MEGAPORT).setHidden(true);
+        market.addIndustry(Industries.PATROLHQ);
+        market.getIndustry(Industries.PATROLHQ).setHidden(true);
+        market.addIndustry("aotd_coronal_wormhole_ind");
+        market.addIndustry("aotd_coronal_collector_ind");
+        if(!market.hasIndustry("starfortress_high")){
+            market.addIndustry("starfortress_high");
+            market.getIndustry("starfortress_high").setHidden(true);
+        }
+        market.addSubmarket(Submarkets.SUBMARKET_STORAGE);
+        market.getTariff().modifyFlat("default_tariff", market.getFaction().getTariffFraction());
+        market.setPrimaryEntity(entity);
+        market.setFactionId(Factions.PLAYER);
+        StoragePlugin plugin = (StoragePlugin) market.getSubmarket(Submarkets.SUBMARKET_STORAGE).getPlugin();
+        plugin.setPlayerPaidToUnlock(true);
+        entity.setMarket(market);
+        if(command.equals("TascColonizataion")){
+            CoronalHypershuntMegastructure mega = (CoronalHypershuntMegastructure) BaseMegastructureScript.getInstanceOfScriptFromEntityIfPresent(entity,"coronal_hypershunt");
+            mega.getMegaStructureSections().forEach(x->x.setRestored(true));
+        }
+
+        entity.addScript(new EveryFrameScript() {
+            @Override
+            public boolean isDone() {
+                return false;
+            }
+
+            @Override
+            public boolean runWhilePaused() {
+                return false;
+            }
+
+            @Override
+            public void advance(float amount) {
+                if(Misc.getDistance(Global.getSector().getPlayerFleet().getLocation(),entity.getLocation())<=entity.getRadius()*6.5F){
+                    if(Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager()!=null){
+                        if(Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager().getActiveFlare()!=null){
+                            Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager().getActiveFlare().arc=1;
+                            Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager().getActiveFlare().extraLengthFlat=0;
+                            Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager().getActiveFlare().extraLengthMult=0;
+                            Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager().getActiveFlare().direction =1;
+                            Misc.getCoronaFor(entity.getStarSystem().getStar()).getFlareManager().getActiveFlare().direction =1;
+                            Misc.getCoronaFor(entity.getStarSystem().getStar()).setTerrainName("");
+                        }
+
+                    }
+
+                }
+                else{
+                    Misc.getCoronaFor(entity.getStarSystem().getStar()).setTerrainName("Corona");
+                }
+
+            }
+        });
+        //entity.setSensorProfile(1f);
+        //entity.setDiscoverable(true);
+        //entity.getDetectedRangeMod().modifyFlat("gen", 5000f);
+
+        //market.getEconGroup();
+        //market.setEconGroup(market.getId());
+        //market.getMemoryWithoutUpdate().set(DecivTracker.NO_DECIV_KEY, true);
+
+        market.reapplyIndustries();
+
+        sector.getEconomy().addMarket(market, false);
+
+        return market;
+    }
+
+}

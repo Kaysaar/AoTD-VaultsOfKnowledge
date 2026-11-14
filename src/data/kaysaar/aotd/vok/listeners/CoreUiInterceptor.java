@@ -1,0 +1,177 @@
+package data.kaysaar.aotd.vok.listeners;
+
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CoreUITabId;
+import com.fs.starfarer.api.campaign.PlanetAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.listeners.CoreUITabListener;
+import com.fs.starfarer.api.campaign.listeners.PlayerColonizationListener;
+import com.fs.starfarer.api.impl.campaign.aotd_entities.NidavelirDestroyedShipyardVisual;
+import com.fs.starfarer.api.impl.campaign.aotd_entities.NidavelirShipyardVisual;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.ui.CustomPanelAPI;
+import com.fs.starfarer.api.ui.UIComponentAPI;
+import com.fs.starfarer.api.ui.UIPanelAPI;
+import com.fs.starfarer.api.util.DelayedActionScript;
+import com.fs.starfarer.campaign.CampaignPlanet;
+
+import data.kaysaar.aotd.tot.plugins.ProductionUtil;
+import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
+import data.kaysaar.aotd.vok.campaign.econ.conditions.NidavelirComplex;
+import data.kaysaar.aotd.vok.campaign.econ.listeners.AoDIndustrialMightListener;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.NidavelirMegastructure;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.models.BaseMegastructureScript;
+import data.kaysaar.aotd.vok.campaign.econ.synergies.models.IndustrySynergiesManager;
+import data.kaysaar.aotd.vok.plugins.ReflectionUtilis;
+import data.kaysaar.aotd.vok.scripts.coreui.BackgroundInterlooper;
+import data.kaysaar.aotd.vok.scripts.coreui.PlanetBackgroundTracker;
+import data.kaysaar.aotd.vok.scripts.misc.AoTDCompoundUIInMarketScript;
+
+
+
+public class CoreUiInterceptor implements CoreUITabListener, PlayerColonizationListener {
+    @Override
+    public void reportAboutToOpenCoreTab(CoreUITabId tab, Object param) {
+        if (tab.equals(CoreUITabId.CARGO)) {
+            AoTDCompoundUIInMarketScript.didIt = false;
+        }
+        PlanetBackgroundTracker.ignoreOutpostParam= false;
+
+        IndustrySynergiesManager.getInstance().advanceImpl(0f);
+        AoDIndustrialMightListener.applyResourceConditionToAllMarkets();
+        for (UIComponentAPI componentAPI : ReflectionUtilis.getChildrenCopy(ProductionUtil.getCoreUI())) {
+            if (componentAPI instanceof CustomPanelAPI panel) {
+                if (panel.getPlugin() instanceof BackgroundInterlooper looper) {
+                    looper.reference = null;
+                    ProductionUtil.getCoreUI().removeComponent(panel);
+                    break;
+                }
+            }
+
+            if (tab.equals(CoreUITabId.CARGO) && ProductionUtil.getCoreUI() != null) {
+                if (param != null) {
+                    if (ReflectionUtilis.findNestedMarketApiFieldFromOutpostParams(param) instanceof MarketAPI market) {
+                        if(NidavelirComplex.getComplexCondition(market)!=null){
+                            initalizeBackgroundPLanet(NidavelirComplex.getComplexCondition(market).getShipyardVisual());
+                        }
+                    }
+                } else if (Global.getSector().getCampaignUI().getCurrentInteractionDialog() != null) {
+                    if (Global.getSector().getCampaignUI().getCurrentInteractionDialog().getInteractionTarget() instanceof PlanetAPI planetAPI) {
+                        if(NidavelirComplex.getComplexCondition(planetAPI.getMarket())!=null){
+                            initalizeBackgroundPLanet(NidavelirComplex.getComplexCondition(planetAPI.getMarket()).getShipyardVisual());
+                        }
+                    }
+                }
+
+
+            }
+            if (tab.equals(CoreUITabId.OUTPOSTS) && ProductionUtil.getCoreUI() != null) {
+                if (param instanceof MarketAPI market) {
+                    if(NidavelirComplex.getComplexCondition(market)!=null){
+                        CoreUiInterceptor.initalizeBackgroundPLanet(NidavelirComplex.getComplexCondition(market).getShipyardVisual());
+                    }
+
+
+                }
+
+
+            }
+
+        }
+    }
+    public static void initalizeBackgroundPLanetWithPreSetOpacity(NidavelirShipyardVisual visual ,float oppacity) {
+        UIPanelAPI saved = (UIPanelAPI) ReflectionUtilis.invokeMethod("getPlanetBackground", ProductionUtil.getCoreUI());
+        if(saved==null)return;
+        CampaignPlanet planetSaved = (CampaignPlanet) ReflectionUtilis.invokeMethod("getPlanet", saved);
+        for (UIComponentAPI componentAPI : ReflectionUtilis.getChildrenCopy(ProductionUtil.getCoreUI())) {
+            if (componentAPI instanceof CustomPanelAPI panel) {
+                if (panel.getPlugin() instanceof BackgroundInterlooper) {
+                    return;
+                }
+            }
+        }
+        BackgroundInterlooper interlooper = new BackgroundInterlooper(visual.getType(), saved.getPosition().getWidth(), saved.getPosition().getHeight(), planetSaved, saved, visual.getCurrAngle());
+        interlooper.setMaxOpacity(oppacity);
+        ProductionUtil.getCoreUI().addComponent(interlooper.getMainPanel()).inBL(0, 0);
+        ReflectionUtilis.invokeMethodWithAutoProjection(
+                "sendToBottomWithinItself", ProductionUtil.getCoreUI(), interlooper.getMainPanel());
+        ReflectionUtilis.invokeMethodWithAutoProjection("sendToBottomWithinItself", ProductionUtil.getCoreUI(), saved);
+    }
+    public static void initalizeBackgroundPLanet(NidavelirShipyardVisual megastructure) {
+        UIPanelAPI saved = (UIPanelAPI) ReflectionUtilis.invokeMethod("getPlanetBackground", ProductionUtil.getCoreUI());
+        if(saved==null)return;
+        CampaignPlanet planetSaved = (CampaignPlanet) ReflectionUtilis.invokeMethod("getPlanet", saved);
+        for (UIComponentAPI componentAPI : ReflectionUtilis.getChildrenCopy(ProductionUtil.getCoreUI())) {
+            if (componentAPI instanceof CustomPanelAPI panel) {
+                if (panel.getPlugin() instanceof BackgroundInterlooper) {
+                    return;
+                }
+            }
+        }
+        BackgroundInterlooper interlooper = new BackgroundInterlooper(megastructure.getType(), saved.getPosition().getWidth(), saved.getPosition().getHeight(), planetSaved, saved, megastructure.getCurrAngle());
+        ProductionUtil.getCoreUI().addComponent(interlooper.getMainPanel()).inBL(0, 0);
+        ReflectionUtilis.invokeMethodWithAutoProjection(
+                "sendToBottomWithinItself", ProductionUtil.getCoreUI(), interlooper.getMainPanel());
+        ReflectionUtilis.invokeMethodWithAutoProjection("sendToBottomWithinItself", ProductionUtil.getCoreUI(), saved);
+    }
+    public static BackgroundInterlooper initalizeBackgroundPLanetForOtherDialog(NidavelirShipyardVisual megastructure,UIPanelAPI saved,UIPanelAPI addTo) {
+        if(saved==null)return  null;
+        CampaignPlanet planetSaved = (CampaignPlanet) ReflectionUtilis.invokeMethod("getPlanet", saved);
+        for (UIComponentAPI componentAPI : ReflectionUtilis.getChildrenCopy(addTo)) {
+            if (componentAPI instanceof CustomPanelAPI panel) {
+                if (panel.getPlugin() instanceof BackgroundInterlooper) {
+                    return null;
+                }
+            }
+        }
+        BackgroundInterlooper interlooper = new BackgroundInterlooper(megastructure.getType(), saved.getPosition().getWidth(), saved.getPosition().getHeight(), planetSaved, saved, megastructure.getCurrAngle());
+        addTo.addComponent(interlooper.getMainPanel()).inBL(0, 0);
+        interlooper.setDialogMode(true);
+        ReflectionUtilis.invokeMethodWithAutoProjection(
+                "sendToBottomWithinItself", addTo, interlooper.getMainPanel());
+        ReflectionUtilis.invokeMethodWithAutoProjection("sendToBottomWithinItself",addTo, saved);
+        ReflectionUtilis.invokeMethodWithAutoProjection(
+                "ensureCompRendersAbove", addTo, interlooper.getMainPanel(),ReflectionUtilis.invokeMethodWithAutoProjection("getBg",addTo));
+        return interlooper;
+    }
+
+    @Override
+    public void reportPlayerColonizedPlanet(PlanetAPI planet) {
+        MarketAPI market = planet.getMarket();
+        if(NidavelirComplex.getComplexCondition(market)!=null){
+            NidavelirShipyardVisual visual = NidavelirComplex.getComplexCondition(market).getShipyardVisual();
+            if(visual instanceof NidavelirDestroyedShipyardVisual){
+                market.getPrimaryEntity().setInteractionImage("illustrations","nidavelir_destroyed");
+            }
+            else{
+                market.getPrimaryEntity().setInteractionImage("illustrations","nidavelir");
+            }
+
+            Global.getSector().addTransientScript(new DelayedActionScript(0.005f) {
+                @Override
+                public boolean runWhilePaused() {
+                    return true;
+                }
+
+                @Override
+                public void doAction() {
+                    initalizeBackgroundPLanet(visual);
+                }
+            });
+        }
+
+
+
+
+    }
+
+    @Override
+    public void reportPlayerAbandonedColony(MarketAPI colony) {
+        if(colony.getPrimaryEntity().hasTag(Tags.CORONAL_TAP)){
+            colony.getPrimaryEntity().getMemory().unset("$usable");
+            colony.getPrimaryEntity().getMemory().unset("$colonized");
+            colony.getPrimaryEntity().getMemory().set("$abandoned",true);
+            colony.getPrimaryEntity().setMarket(null);
+        }
+    }
+}

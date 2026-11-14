@@ -1,0 +1,79 @@
+package data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models;
+
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.MarketImmigrationModifier;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
+import com.fs.starfarer.api.impl.campaign.population.PopulationComposition;
+import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.Fonts;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.Misc;
+
+import java.awt.*;
+
+public abstract class BaseColonyDevelopment implements ColonyDevelopmentAPI, MarketImmigrationModifier {
+    public static String condIdApplier = "aotd_colony_development_cond";
+    //Maybe gonna expand this later?
+    public float getOrder(){
+        return 500f;
+    }
+    @Override
+    public void generateDetailingTooltip(MarketAPI market, TooltipMakerAPI tooltip) {
+        tooltip.setTitleOrbitronLarge();
+        tooltip.addTitle(getName());
+        generateDescriptionSection(market, tooltip);
+        tooltip.addSpacer(10f);
+        tooltip.addSectionHeading("Effects from colony development plan", Alignment.MID,0f);
+        generateEffects(market, tooltip, "graphics/fonts/orbitron20aabold.fnt");
+        tooltip.addSpacer(15f);
+        generateOtherInfo(market, tooltip);
+
+    }
+
+    @Override
+    public boolean canShowOnMarket(MarketAPI market) {
+        return !market.getContainingLocation().hasTag(Tags.SYSTEM_ABYSSAL);
+    }
+
+    public boolean doesMeetAdditionalCriteriaForDevelopment(MarketAPI market) {
+        return true;
+    }
+    public void executePlanBeforeColonization(MarketAPI market) {
+
+    }
+    public Color getBrightButtonColour(MarketAPI market){
+        return Misc.getBasePlayerColor();
+    }
+    public Color getDarkButtonColour(MarketAPI market){
+        return Misc.getDarkPlayerColor();
+    }
+
+    @Override
+    public void generateTooltipForMarketCond(MarketAPI market, TooltipMakerAPI tooltip, boolean expanded) {
+        tooltip.setParaFont(Fonts.ORBITRON_12);
+        tooltip.addPara(getName(), Misc.getTooltipTitleAndLightHighlightColor(),5f);
+        tooltip.setParaFont(Fonts.DEFAULT_SMALL);
+        tooltip.addSpacer(10f);
+        tooltip.addSectionHeading("Effects from colony development plan", Alignment.MID,0f);
+        generateEffects(market, tooltip, Fonts.ORBITRON_12);
+    }
+
+    public void generateDescriptionSection(MarketAPI market, TooltipMakerAPI tooltip) {
+
+    }
+
+    @Override
+    public void modifyIncoming(MarketAPI market, PopulationComposition incoming) {
+
+    }
+
+    public void generateEffects(MarketAPI market, TooltipMakerAPI tooltip, String fontForSections) {
+
+    }
+    public void generateDrawbacksSection(MarketAPI market, TooltipMakerAPI tooltip) {
+
+    }
+    public void generateOtherInfo(MarketAPI market, TooltipMakerAPI tooltip) {
+
+    }
+}
