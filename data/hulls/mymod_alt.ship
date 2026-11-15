@@ -1,0 +1,78 @@
+{
+  "hullName": "Alt",
+  "hullId": "mymod_alt",
+  "hullSize": "FIGHTER",
+  "spriteName": "graphics/ships/fighters/mymod_alt.png",
+  "style": "HIGH_TECH",
+  "height": 42,
+  "width": 26,
+  "center": [13, 21],
+  "collisionRadius": 31,
+  "shieldCenter": [0, 0],
+  "shieldRadius": 29.5,
+  "viewOffset": 0,
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": 0,
+      "locations": [8, -5]
+    },
+    {
+      "id": "WS0002",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": -0,
+      "locations": [8, 5]
+    },
+    {
+      "id": "WS0003",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": 0,
+      "locations": [12, -8]
+    },
+    {
+      "id": "WS0004",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": -0,
+      "locations": [12, 8]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-11, 5],
+      "length": 30,
+      "width": 6,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-11, -5],
+      "length": 30,
+      "width": 6,
+      "angle": -180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -21, 0,
+    -5.5, 13.5,
+    20.5, 0,
+    20.5, -0,
+    -5.5, -13.5,
+    -21, -0
+  ]
+}

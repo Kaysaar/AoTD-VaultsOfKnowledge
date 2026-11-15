@@ -5,7 +5,7 @@
 		"nameInText":"bifrost gate",
 		"aOrAn":"an",
 		"defaultRadius":60, # used if radius<0 in addCustomEntity()
-		"interactionImage":"graphics/illustrations/sensor_array.jpg",
+		"interactionImage":"graphics/icons/megastructures/bifrost_upscaled.png",
 		"icon":"graphics/icons/gate0.png",
 		"iconWidth":20,
 		"iconHeight":20,
@@ -64,6 +64,23 @@
 		"layers":[STATIONS, BELOW_STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
 		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.PlutoMiningStation",
 	},
+	"aotd_hyperspace_scanner":{
+		"baseId":"base_campaign_objective",
+		"defaultName":"Hyperspace Scanner", # used if name=null in addCustomEntity()
+		"nameInText":"hypershunt receiver",
+		"shortName":"receiver",
+		"icon":"graphics/icons/hypershunt_reciver_icon.png",
+		"iconWidth":24,
+		"iconHeight":24,
+		"sprite":"graphics/stations/aotd_hyperspace_scanner.png",
+		"spriteWidth":89,
+		"spriteHeight":48,
+		"customDescriptionId":"aotd_hypershunt_scanner",
+		"interactionImage":"graphics/illustrations/aotd_hyperspace_scanner_gas.png",
+		"tags":["aotd_hyperspace_scanner", "neutrino_high", "objective"],
+		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.HyperspaceScannerEntityPlugin",
+	},
 	"aotd_hypershunt_receiver":{
 		"baseId":"base_campaign_objective",
 		"defaultName":"Hypershunt Receiver", # used if name=null in addCustomEntity()
@@ -76,10 +93,46 @@
 		"spriteWidth":71,
 		"spriteHeight":111,
 		"customDescriptionId":"aotd_hypershunt_receiver",
-		"interactionImage":"graphics/illustrations/sensor_array.jpg",
+		"interactionImage":"graphics/illustrations/hypershunt_reciver.png",
 		"tags":["aotd_hypershunt_receiver", "neutrino_high", "objective"],
 		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
 		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.HypershuntReceiverEntityPlugin",
+	},
+	"aotd_crystal_casino":{
+		"baseId":"base_campaign_objective",
+		"defaultRadius":120,
+		"defaultName":"Crystal Casino", # used if name=null in addCustomEntity()
+		"nameInText":"crystal casino",
+		"shortName":"casino",
+		"icon":"graphics/icons/aotd_crystal_casino_icon.png",
+		"iconWidth":24,
+		"iconHeight":24,
+		"sprite":"graphics/stations/aotd_crystal_casino.png",
+		"spriteWidth":95,
+		"spriteHeight":180,
+		"customDescriptionId":"aotd_crystal_casino",
+		"interactionImage":"graphics/illustrations/aotd_crystal_casino.png",
+		"tags":["aotd_crystal_casino", "neutrino_high", "objective"],
+		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.CrystalCasinoEntityPlugin",
+	},
+	"aotd_gnajid_station":{
+		"baseId":"base_campaign_objective",
+		"defaultRadius":120,
+		"defaultName":"Gnajid Industrial Station", # used if name=null in addCustomEntity()
+		"nameInText":"gnajid station",
+		"shortName":"gnajid",
+		"icon":"graphics/icons/aotd_gnajid_icon.png",
+		"iconWidth":24,
+		"iconHeight":24,
+		"sprite":"graphics/stations/aotd_dijang.png",
+		"spriteWidth":84,
+		"spriteHeight":192,
+		"customDescriptionId":"aotd_gnajid_station",
+		"interactionImage":"graphics/illustrations/aotd_gnajid.png",
+		"tags":["aotd_gnajid_station", "neutrino_high", "objective"],
+		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.NotDijangEntityPlugin",
 	},
 	"nid_shipyards":{
 		"defaultName":"Nid Shipyards", # used if name=null in addCustomEntity()

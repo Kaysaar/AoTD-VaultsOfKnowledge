@@ -314,3 +314,56 @@ Regrettably, the self-repair systems have sustained damage, though they are reco
 ,,,,,,
 ,,,,,,
 ,,,,,,
+# CRYSTAL CASINO - CONTACT PENTHOUSES,,,,,,
+aotdCasinoOffer,PopulateOptions,"$isPerson
+AoTDCrystalCasinoContacts canOffer",AoTDCrystalCasinoContacts addInviteTooltip,,"35:aotdCasinoInviteConfirm:""I would like to offer you a penthouse at the Crystal Casino.""","CSV declares the option (order 35); Java adds the highlighted 10,000-credit/month and distance-based travel hover tooltip. Pending invitations reserve slots."
+aotdCasinoDismissOption,PopulateOptions,"$isPerson
+AoTDCrystalCasinoContacts isResident",,,"36:aotdCasinoDismissStart:""We need to discuss ending your penthouse stay.""",Offer dismissal only after physical arrival (not while in transit).
+,,,,,,
+aotdCasinoInviteConfirm,DialogOptionSelected,$option == aotdCasinoInviteConfirm,"AoTDCrystalCasinoContacts prepare
+FireAll AoTDCrystalCasinoInvite
+AoTDCrystalCasinoContacts resolve
+FireBest AoTDCrystalCasinoInviteResult
+AoTDCrystalCasinoContacts printEffects",,,"prepare -> FireAll hooks -> resolve (removes source comm entry, reserves penthouse, queues travel) -> FireBest response -> printEffects (actual rep change and sound)."
+"# Invitation hooks; FireAll executes each matching row, not just the highest score.",,,,,,
+aotdCasinoDefaultAccept,AoTDCrystalCasinoInvite,,AoTDCrystalCasinoContacts accept,,,Default acceptance proposal; extensions can decline/blacklist. resolve makes the final decision.
+aotdCasinoChurchRefusal,AoTDCrystalCasinoInvite,$personFaction.id == luddic_church,AoTDCrystalCasinoContacts decline,,,
+aotdCasinoPathRefusal,AoTDCrystalCasinoInvite,$personFaction.id == luddic_path,AoTDCrystalCasinoContacts decline,,,
+,,,,,,
+# One response chosen by FireBest. Larger score beats the general response.,,,,,,
+aotdCasinoResult_accepted,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == accepted score:1,,"""That is a generous offer. I accept. I will make the necessary travel arrangements.""
+
+A penthouse has been reserved at the Crystal Casino. The contact will relocate after the journey, with monthly charges starting when they arrive.",cutCommLink:Close the comm link,Contact disappears from original colony comm directory on acceptance. Custom faction/person FireBest rules can override the dialogue by score.
+aotdCasinoResult_Hegemony,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts factionIs hegemony score:10000",,"""An interesting offer. I'm sure my superiors will be interested in opening a security outpost in such an establishment...of course providing the space under a non binding subsidized lease is a given for acceptance. I shall see you in a few weeks after my superiors have reassigned me.""",cutCommLink:Close the comm link,Faction-specific accepted response. Uses the saved response person after comm-directory removal; score overrides generic acceptance.
+aotdCasinoResult_PerseanLeague,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts factionIs persean score:10000",,"""A fascinating proposition! In return of acting as a go-between our peoples, I wish in return to use the space to further my own standing inside the League. 
+
+Of course that includes galas, soirees and private events with high ranking members of the League. I trust that our privacy will be respected and in return the League will reciprocate with a firm partnership.""",cutCommLink:Close the comm link,Faction-specific accepted response. Uses the saved response person after comm-directory removal; score overrides generic acceptance.
+aotdCasinoResult_TriTachyon,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts factionIs tritachyon score:10000",,"""An amenable deal. Im certain the Board will be willng to place me as representative for the company, as well as priority and discounted access to the facilities onboard the Crystal Casino, as well as a nondisclosure clause of any potential deals between your government and the Board.""",cutCommLink:Close the comm link,Faction-specific accepted response. Uses the saved response person after comm-directory removal; score overrides generic acceptance.
+aotdCasinoResult_Independent,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts factionIs independent score:10000",,"""While Im sure there are plenty of other independent operators that would kill to have such an offer, this provides me enough clout to impose myself as a middle-man between your government and the various associated neutral captains and polities. I look forward to working with you.""",cutCommLink:Close the comm link,Faction-specific accepted response. Uses the saved response person after comm-directory removal; score overrides generic acceptance.
+aotdCasinoResult_Pirates,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts factionIs pirates score:10000",,"""Well space me naked, I'll bloody accept! Just promise to keep any seedy looking bastards I don't say are all good away from the station and you got yourself a deal! It beats hoping I wont get shot or stabbed on any given day plus being able to gather info on nobs and rich blokes for extra creds!""",cutCommLink:Close the comm link,Faction-specific accepted response. Uses the saved response person after comm-directory removal; score overrides generic acceptance.
+aotdCasinoResult_church,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == luddic
+AoTDCrystalCasinoContacts factionIs luddic_church score:10000",,"""Inhabit that den of Sin? Not even if Ludd himself returned tomorrow preaching your glory would I do such a thing! You best not suggest such a thing again to me or I will turn you over to the Knights for tribunal and cleansing of your mortal coil!""",cutCommLink:Close the comm link,Luddic Church always refuses in resolve(); faction-specific refusal response.
+aotdCasinoResult_path,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == luddic
+AoTDCrystalCasinoContacts factionIs luddic_path score:10000",,"""MOVE INTO THAT AFFRONT OF LUDD? YOUR LUCKY I DONT SHOOT YOU WHERE YOU STAND, TO INSINUATE SUCH ABHORRENT BLASPHEMY TO ME. LEAVE IF YOU DO NOT WISH TO MAKE AN ENEMY OF THE PATH PERMANENTLY.""",cutCommLink:Close the comm link,Luddic Path always refuses in resolve(); faction-specific refusal response.
+aotdCasinoResult_luddic,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == luddic score:1,,"""You would have me take up residence in that den of excess? No. My faith is not for sale.""",cutCommLink:Close the comm link,
+aotdCasinoResult_blacklisted,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == blacklisted score:1,,"""No. I will not be taking up residence at your Casino.""",cutCommLink:Close the comm link,
+aotdCasinoResult_declined,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == declined score:1,,"""Thank you for the offer, but I must decline.""",cutCommLink:Close the comm link,
+aotdCasinoResult_full,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == full score:1,,All ten penthouses are occupied. You must end an existing guest's stay before inviting another contact.,cutCommLink:Close the comm link,
+aotdCasinoResult_unavailable,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == unavailable score:1,,The Crystal Casino is no longer available to receive guests.,cutCommLink:Close the comm link,
+aotdCasinoResult_invalid,AoTDCrystalCasinoInviteResult,$aotdCasinoInviteResult == invalid score:1,,This contact cannot currently be moved into a Casino penthouse.,cutCommLink:Close the comm link,
+# EXAMPLE - uncomment and replace the person ID to override the accepted response:,,,,,,
+#aotdCasinoResult_specialPerson,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts personIs your_person_id score:10000",,"""I would be delighted to accept your invitation, Captain.""",cutCommLink:Close the comm link,Commented example; override by person/faction and score. Reputation feedback happens automatically after FireBest.
+# EXAMPLE - faction-specific acceptance override:,,,,,,
+#aotdCasinoResult_specialFaction,AoTDCrystalCasinoInviteResult,"$aotdCasinoInviteResult == accepted
+AoTDCrystalCasinoContacts factionIs tritachyon score:10000",,"""An interesting business arrangement. I accept.""",cutCommLink:Close the comm link,EXAMPLE: Remove # from id to enable and change tritachyon to your faction ID; 10000 outranks the generic score:1. Uses saved response person after comm removal.
+,,,,,,
+aotdCasinoDismissStart,DialogOptionSelected,$option == aotdCasinoDismissStart,AoTDCrystalCasinoContacts describeDismiss,,"aotdCasinoDismissConfirm:End their stay (-50 personal reputation)
+defaultBack:Let them stay",
+aotdCasinoDismissConfirm,DialogOptionSelected,$option == aotdCasinoDismissConfirm,AoTDCrystalCasinoContacts dismiss,,cutCommLink:Close the comm link,The Java command calculates the actual reputation delta and displays it through CoreReputationPlugin.
+# END CRYSTAL CASINO,,,,,,

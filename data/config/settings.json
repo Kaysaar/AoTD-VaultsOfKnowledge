@@ -56,6 +56,13 @@
 			"sp_stage_finish":"graphics/icons/intel/purple.png"
 		},
 		"ui_icons_tech_tree":{
+			"aotd_domain_network_engineering":"graphics/icons/tech/aotd_domain_network_engineering.png",
+			"aotd_aic":"graphics/icons/tech/aotd_aic.png",
+			"aotd_light_in_the_dark":"graphics/icons/tech/aotd_light_in_the_dark.png",
+			"aotd_hyperwave_detection":"graphics/icons/tech/aotd_hyperwave_detection.png",
+			"aotd_stellar_irradiance_engineering":"graphics/icons/tech/aotd_stellar_irradiance_enginnering.png",
+			"aotd_orbital_configuration_theory":"graphics/icons/tech/aotd_orbital_configuraiton_theory.png",
+			"aotd_crystalline_leisure_architecture":"graphics/icons/tech/aotd_crystaline.png",
 			"farming1":"graphics/icons/tech/farming1.png",
 			"farming2":"graphics/icons/tech/farming2.png",
 			"farming3":"graphics/icons/tech/farming3.png",
@@ -146,7 +153,16 @@
 			"researched":"graphics/icons/tech/researched.png",
 			"aotd_mining_megaplex_sub":"graphics/icons/tech/subicon_mining_megaplex.png",
 			"test":"graphics/icons/tech/test.png",
-
+			"comm_relay_sub":"graphics/icons/tech/comm_relay_sub.png",
+			"nav_buoy_sub":"graphics/icons/tech/nav_buoy_sub.png",
+			"sensor_array_sub":"graphics/icons/tech/sensor_array_sub.png",
+			"stellar_mirror_sub":"graphics/icons/tech/stellar_mirror_sub.png",
+			"stellar_shade_sub":"graphics/icons/tech/stellar_shade_sub.png",
+			"aotd_apc_sub":"graphics/icons/tech/aotd_apc_sub.png",
+			"aotd_hypershunt_receiver_sub":"graphics/icons/tech/aotd_hypershunt_receiver_sub.png",
+			"aotd_gnajid_station_sub":"graphics/icons/tech/aotd_gnajid_station_sub.png",
+			"aotd_crystal_casino_sub":"graphics/icons/tech/aotd_crystal_casino_sub.png",
+			"bifrost_gate_sub":"graphics/icons/tech/bifrost_gate_sub.png"
 		},
 		"ui_campaign_components":{
 			"tech_panel":"graphics/ui/tech_progression_campaign.png",
@@ -193,7 +209,7 @@
 
 
 		},
-		"fx": {#for magictrails
+		"fx": {
 			"aotd_gungnir_trail1":"graphics/fx/aotd_gungnir_core_trail.png",
 			"aotd_gungnir_trail2":"graphics/fx/aotd_gungnir_star_trail.png",
 			"aotd_gungnir_trail3":"graphics/fx/aotd_gungnir_stripes_trail.png"
@@ -205,12 +221,21 @@
 			"pluto":"graphics/icons/aotd_pluto_mining_station.png"
 			
 		},
+		"shop_graphics":{
+    		 "databank1":"graphics/shop_graphics/databank1.png",
+		},
 		"aotd_icons":{
             "fleet_ai":"graphics/icons/fleet_ai.png",
 			"fleet_merc":"graphics/icons/fleet_merc.png",
 			"compound_info":"graphics/icons/smoll_icon/comp_smol.png"
 		},
-
+		"aotd_market":{
+            "floating_city_1":"graphics/icons/markets/gas4.png",
+			"floating_city_2":"graphics/icons/markets/gas3.png",
+			"floating_city_3":"graphics/icons/markets/gas2.png",
+			"floating_city_4":"graphics/icons/markets/gas1.png",
+			"aotd_nid_destroyted":"graphics/icons/markets/nidavelir_complex_destroyed.png",
+		},
 		"sectionImage":{
 			"WormholeGenerator":"graphics/icons/megastructures/aotd_coronal_wormhole.jpg",
 			"CoronalCollector":"graphics/icons/megastructures/aotd_coronal_collector.jpg",
@@ -237,11 +262,14 @@
 		"industry":{
 			"pluto_active":"graphics/icons/industry/aotd_pluto_industry_active.png",
 			"aotd_fuel_refinery_no_atmo":"graphics/icons/industry/aotd_fuel_refinery_no_atmo.png",
-			"aotd_daedalus_array_no_atmo":"graphics/icons/industry/aotd_daedalus_array_no_atmo.png"
+			"aotd_daedalus_array_no_atmo":"graphics/icons/industry/aotd_daedalus_array_no_atmo.png",
+			"aotd_nid_destroyed":"graphics/icons/industry/aotd_nidavelir_ind_damaged.png"
 		},
 		
 		"illustrations":{
-            "industrial_megafacility":"graphics/illustrations/industrial_megafacility.jpg"
+            "industrial_megafacility":"graphics/illustrations/industrial_megafacility.jpg",
+			"nidavelir":"graphics/illustrations/nidavelir.png",
+			"nidavelir_destroyed":"graphics/illustrations/nidavelir_destroyed.png"
 		},
 		"signalis_ui":{
             "keypad_bg":"graphics/ui/keypad.png"
