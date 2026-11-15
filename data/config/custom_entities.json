@@ -69,13 +69,13 @@
 		"defaultName":"Hyperspace Scanner", # used if name=null in addCustomEntity()
 		"nameInText":"hypershunt receiver",
 		"shortName":"receiver",
-		"icon":"graphics/icons/hypershunt_reciver_icon.png",
-		"iconWidth":24,
-		"iconHeight":24,
+		"icon":"graphics/icons/aotd_hyperspace_scanner_icon.png",
+		"iconWidth":28,
+		"iconHeight":28,
 		"sprite":"graphics/stations/aotd_hyperspace_scanner.png",
 		"spriteWidth":89,
-		"spriteHeight":48,
-		"customDescriptionId":"aotd_hypershunt_scanner",
+		"spriteHeight":65,
+		"customDescriptionId":"aotd_hyperspace_scanner",
 		"interactionImage":"graphics/illustrations/aotd_hyperspace_scanner_gas.png",
 		"tags":["aotd_hyperspace_scanner", "neutrino_high", "objective"],
 		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values

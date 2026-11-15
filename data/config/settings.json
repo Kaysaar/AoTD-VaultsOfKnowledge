@@ -162,7 +162,8 @@
 			"aotd_hypershunt_receiver_sub":"graphics/icons/tech/aotd_hypershunt_receiver_sub.png",
 			"aotd_gnajid_station_sub":"graphics/icons/tech/aotd_gnajid_station_sub.png",
 			"aotd_crystal_casino_sub":"graphics/icons/tech/aotd_crystal_casino_sub.png",
-			"bifrost_gate_sub":"graphics/icons/tech/bifrost_gate_sub.png"
+			"bifrost_gate_sub":"graphics/icons/tech/bifrost_gate_sub.png",
+			"aotd_hyperspace_scanner_sub":"graphics/icons/tech/aotd_hyperspace_scanner_sub.png"
 		},
 		"ui_campaign_components":{
 			"tech_panel":"graphics/ui/tech_progression_campaign.png",
@@ -265,11 +266,12 @@
 			"aotd_daedalus_array_no_atmo":"graphics/icons/industry/aotd_daedalus_array_no_atmo.png",
 			"aotd_nid_destroyed":"graphics/icons/industry/aotd_nidavelir_ind_damaged.png"
 		},
-		
 		"illustrations":{
             "industrial_megafacility":"graphics/illustrations/industrial_megafacility.jpg",
 			"nidavelir":"graphics/illustrations/nidavelir.png",
-			"nidavelir_destroyed":"graphics/illustrations/nidavelir_destroyed.png"
+			"nidavelir_destroyed":"graphics/illustrations/nidavelir_destroyed.png",
+			"aotd_hyperspace_scanner_gas":"graphics/illustrations/aotd_hyperspace_scanner_gas.png",
+			"aotd_hyperspace_scanner_ice":"graphics/illustrations/aotd_hyperspace_ice.png"
 		},
 		"signalis_ui":{
             "keypad_bg":"graphics/ui/keypad.png"
