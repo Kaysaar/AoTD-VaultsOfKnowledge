@@ -8,7 +8,6 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.plugins.SurveyPlugin;
 import com.fs.starfarer.api.ui.*;
-import com.fs.starfarer.coreui.A.R;
 import data.kaysaar.aotd.tot.plugins.ProductionUtil;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.ui.ColonyDevelopmentDialog;
 import data.kaysaar.aotd.vok.campaign.econ.industry.TradePostIndustry;

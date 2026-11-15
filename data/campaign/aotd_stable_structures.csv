@@ -1,0 +1,16 @@
+id,creditCost,daysToBuild,totalResourcesNeeded,downgrade,pluginClass,order
+aotd_hypershunt_receiver,1700000,60,"aotd_spaceframe_modules:1600,domain_heavy_machinery:1200,coronal_portal:1",,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.HypershuntReciverImpl,200
+aotd_gnajid_station,1300000,150,aotd_spaceframe_modules:4000,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.GnajidIndustrialStationImpl,201
+aotd_crystal_casino,900000,120,aotd_spaceframe_modules:3500,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.CrystalCasinoImpl,202
+aotd_hyperspace_scanner,850000,90,"aotd_spaceframe_modules:1800,domain_heavy_machinery:300",,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.HyperspaceScannerImpl,203
+coronal_tap,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.CoronalHypershuntSystemStructureView,190
+aotd_pluto_station,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.PlutoSystemStructureView,191
+nid_shipyards,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.NidavelirSystemStructureView,192
+nid_shipyards_damaged,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.NidavelirSystemStructureView,193
+bifrost_gate,2100000,90,"domain_heavy_machinery:600,refined_metal:2100,purified_rare_metal:900",,data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostSystemStructure,250
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,

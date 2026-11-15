@@ -5,7 +5,6 @@ import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
 
-/** Saved with the sector; retains the actual person and original directory state. */
 public class CrystalCasinoGuest {
     public final PersonAPI person;
     public final MarketAPI origin;
@@ -16,6 +15,10 @@ public class CrystalCasinoGuest {
     public final boolean originallyHidden;
     public final int originalDirectoryIndex;
     public boolean active = true;
+
+
+    public boolean travelling;
+    public float travelDaysRemaining;
 
     public CrystalCasinoGuest(PersonAPI person, MarketAPI host, SectorEntityToken casino) {
         this.person = person;

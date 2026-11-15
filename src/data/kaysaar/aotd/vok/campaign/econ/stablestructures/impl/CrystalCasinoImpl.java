@@ -10,6 +10,7 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -27,6 +28,9 @@ import java.util.LinkedHashMap;
 public class CrystalCasinoImpl extends AoTDStableStructureImpl {
     public static final String CASINO_ID = "aotd_crystal_casino";
     public static final String PLANETARY_INDUSTRY_ID = "aotd_crystal_casino_estate";
+    public static final int BONUS_MAX_CONTACTS = 5;
+    // One Casino per player faction: use a stable ID so rebuilding never stacks the bonus.
+    public static final String CONTACTS_MOD_ID = "aotd_crystal_casino_luxurious_penthouses";
 
     protected PlanetAPI targetPlanet;
 
@@ -121,13 +125,49 @@ public class CrystalCasinoImpl extends AoTDStableStructureImpl {
                 planet.getLocation().y + (float) Math.sin(angle) * radius);
     }
 
-    // The station is visual; the planetary industry is the sole owner of its effects and AI core.
+    // Casino tourism and AI-core effects are owned by the linked planetary industry.
+    // This system structure additionally grants a global player contact-capacity bonus.
     @Override
     public void apply() {
+        if (Global.getSector() == null) return;
+        CrystalCasinoPlanetaryIndustry industry = getLinkedIndustry();
+        if (isPlayerOwned() && isHostOperational()
+                && industry != null && industry.isCasinoOperational()) {
+            Global.getSector().getPlayerStats().getDynamic()
+                    .getMod(Stats.NUM_MAX_CONTACTS_MOD)
+                    .modifyFlat(CONTACTS_MOD_ID, BONUS_MAX_CONTACTS, "Crystal Casino - luxurious penthouses");
+        } else {
+            unapply();
+        }
     }
 
     @Override
     public void unapply() {
+        if (Global.getSector() == null) return;
+        Global.getSector().getPlayerStats().getDynamic()
+                .getMod(Stats.NUM_MAX_CONTACTS_MOD).unmodifyFlat(CONTACTS_MOD_ID);
+    }
+
+    // Reconcile after ownership, functionality, or linked-industry state changes.
+    // The regular ToT structure economy task also calls unapply()/apply().
+    @Override
+    public void advance(float amount) {
+        super.advance(amount);
+        if (Global.getSector() != null && !Global.getSector().isPaused() && isCurrentImplementation()) {
+            apply();
+        }
+    }
+
+    @Override
+    protected void notifyDisrupted() {
+        unapply();
+        super.notifyDisrupted();
+    }
+
+    @Override
+    protected void disruptionFinished() {
+        super.disruptionFinished();
+        apply();
     }
 
     @Override
@@ -173,12 +213,14 @@ public class CrystalCasinoImpl extends AoTDStableStructureImpl {
             return;
         }
         industry.reapply();
+        apply(); // Grant the additional five contact slots as soon as construction finishes.
         Global.getLogger(CrystalCasinoImpl.class).info(
                 "Crystal Casino registered finished entity " + entity.getId() + " on " + market.getId());
     }
 
     @Override
     public void notifyRemoved() {
+        unapply(); // Remove the global modifier before detaching the Casino entity.
         SectorEntityToken entity = getCurrentlyTiedEntity();
         CrystalCasinoGuestManager.getInstance().casinoRemoved(entity);
         MarketAPI market = getTargetMarket();
@@ -228,12 +270,21 @@ public class CrystalCasinoImpl extends AoTDStableStructureImpl {
         String growth = "+" + Misc.getRoundedValue(CrystalCasinoPlanetaryIndustry.POPULATION_GROWTH_BONUS * effectiveness) + "%";
         tooltip.addPara("Grants %s accessibility and %s population growth to same-faction colonies in the system.",
                 3f, Misc.getHighlightColor(), accessibility, growth);
-        tooltip.addPara("Invite established contacts through their comm dialogue. Each penthouse costs %s credits per month. Up to %s people can be invited, at the same time", 3f, Color.ORANGE,Misc.getWithDGS(10000),"10");
+
+        tooltip.addSectionHeading("Luxurious penthouses", Alignment.MID, 10f);
+        tooltip.addPara("Invite established contacts through their comm dialogue. Those who accept relocate to "
+                + "the Crystal Casino's host colony after making travel arrangements.", 5f);
+        tooltip.addPara("Each resident's penthouse costs %s credits per month, beginning when they arrive. "
+                + "Up to %s contacts can be accommodated at a time.", 5f, Misc.getHighlightColor(),
+                Misc.getDGSCredits(CrystalCasinoGuestManager.MONTHLY_COST),
+                String.valueOf(CrystalCasinoGuestManager.CAPACITY));
+        tooltip.addPara("Increases the maximum number of contacts you can establish by %s while the Casino is operational.",
+                5f, Misc.getPositiveHighlightColor(), "+" + BONUS_MAX_CONTACTS);
         if (constructed) {
-            tooltip.addPara("Occupied penthouses: %s / %s. Monthly penthouse expenses: %s", 3f, Misc.getHighlightColor(),
-                    "" + CrystalCasinoGuestManager.getInstance().getGuestCount(), "" + CrystalCasinoGuestManager.CAPACITY,
-                    Misc.getDGSCredits(CrystalCasinoGuestManager.getInstance().getGuestCount() * CrystalCasinoGuestManager.MONTHLY_COST));
+            tooltip.addPara("Allocated penthouses: %s / %s. Charges apply only to residents who have arrived.",
+                    5f, Misc.getHighlightColor(),
+                    String.valueOf(CrystalCasinoGuestManager.getInstance().getGuestCount()),
+                    String.valueOf(CrystalCasinoGuestManager.CAPACITY));
         }
     }
 }
-

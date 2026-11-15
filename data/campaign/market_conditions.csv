@@ -14,12 +14,12 @@ Coronal Hypershunt,aotd_coronal_market_cond,TRUE,FALSE,data.kaysaar.aotd.vok.cam
 Nidavelir Complex,aotd_nidavelir_complex,TRUE,FALSE,data.kaysaar.aotd.vok.campaign.econ.conditions.NidavelirComplex,"Former Domain gem, this megastructure is capable of producing ships and weapons at scale, never seen in the Persean Sector.",graphics/icons/markets/nidavelir_complex.png,640
 Pluto Mining Station,aotd_pluto_station,TRUE,FALSE,data.kaysaar.aotd.vok.campaign.econ.conditions.PlutoStation,"Former Domain gem, this megastructure is capable of excavation and refining enormous amount of resources.",graphics/icons/markets/aotd_pluto.png,641
 aotd_growing_demand_applier,aotd_growing_demand_applier,,TRUE,data.kaysaar.aotd.vok.campaign.econ.growingdemand.models.GrowingDemandConditionEnforcer,,graphics/icons/markets/aotd_pluto.png,641
-Colony Development Program,aotd_colony_development_cond,,TRUE,data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentCondition,This settlement follows a defined development path that shapes the colony's foundation and future.,graphics/icons/markets/aotd_colony_development_plan_icon.png,50
+Colony Development Program,aotd_colony_development_cond,TRUE,TRUE,data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentCondition,This settlement follows a defined development path that shapes the colony's foundation and future.,graphics/icons/markets/aotd_colony_development_plan_icon.png,9999999
 Nutritious Wildlife,aotd_nutritious_wildlife,TRUE,FALSE,data.kaysaar.aotd.vok.campaign.econ.conditions.AoTDNutritiousWildlife,The fauna of this world is very compatible and nutritional to humans.,graphics/icons/markets/aotd_nutritious_wildlife.png,310
-,,,,,,,
-,,,,,,,
-,,,,,,,
-,,,,,,,
+Floating City,aotd_floating_city,TRUE,TRUE,data.kaysaar.aotd.vok.campaign.econ.conditions.FloatingCityCondition,"Using a set of heavily modified colossal fuel-hungry thrusters, one could lift along an entire city in the atmosphere of a planet.",graphics/icons/markets/gas4.png,9999998
+Logistics Boneyard,aotd_logistic_boneyards,TRUE,,data.kaysaar.aotd.vok.campaign.econ.conditions.LogiBoneyard,"The remains of a vast logistics fleet, once tasked with delivering the materials and machinery required for the construction of Pluto Station. Countless hulls now lie scattered across the world in varying states of decay, many partially stripped by generations of scavengers. Their sheer number makes habitation difficult, but the near-limitless reserves of metals and transplutonics they contain make such inconveniences relatively minor.",graphics/icons/markets/aotd_scav.png,900
+Crashed Ring Segments,aotd_crashed_ring_segmnets,TRUE,,data.kaysaar.aotd.vok.campaign.econ.conditions.CrashedRingSegments,"Cataclysmic craters pockmark this world around the equator where various segments of the orbiting ring have broken off and crashed onto the planet, remaining relatively intact.",graphics/icons/markets/aotd_nid_ruin.png,901
+Advanced Industrial Controller,aotd_gnajid_aic,,TRUE,data.kaysaar.aotd.vok.campaign.econ.conditions.GnajidAICCondition,"An advanced industrial management complex deployed by Gnajid Industrial Station, coordinating construction, resource use and industrial synergies.",graphics/icons/markets/aotd_aic.png,315
 ,,,,,,,
 ,,,,,,,
 ,,,,,,,

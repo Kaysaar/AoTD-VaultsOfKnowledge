@@ -1,0 +1,216 @@
+{
+  "hullName": "Apoapsis",
+  "hullId": "mymod_apoapsis",
+  "hullSize": "CAPITAL_SHIP",
+  "spriteName": "graphics/ships/mymod_apoapsis.png",
+  "style": "MIDLINE",
+  "height": 441,
+  "width": 153,
+  "center": [76.5, 220.5],
+  "collisionRadius": 242,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 226.5,
+  "viewOffset": 0,
+  "builtInMods": [
+    "eccm",
+    "surveying_equipment",
+    "efficiency_overhaul"
+  ],
+  "builtInWings": [
+    "mymod_alt",
+    "mymod_neue"
+  ],
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 230,
+      "angle": 0,
+      "locations": [69.5, -2.5]
+    },
+    {
+      "id": "WS0002",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 150,
+      "angle": -75,
+      "locations": [25.5, -21.5]
+    },
+    {
+      "id": "WS0003",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 150,
+      "angle": -90,
+      "locations": [-77.5, -32.5]
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 220,
+      "angle": 0,
+      "locations": [92.5, -2.5]
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 160,
+      "angle": 100,
+      "locations": [-78.5, 41.5]
+    },
+    {
+      "id": "WS0006",
+      "size": "LARGE",
+      "type": "HYBRID",
+      "mount": "HARDPOINT",
+      "arc": 15,
+      "angle": 0,
+      "locations": [122.5, -2.5]
+    },
+    {
+      "id": "WS0007",
+      "size": "LARGE",
+      "type": "MISSILE",
+      "mount": "HARDPOINT",
+      "arc": 0,
+      "angle": -45,
+      "locations": [-13, -57]
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "MISSILE",
+      "mount": "HARDPOINT",
+      "arc": 0,
+      "angle": -45,
+      "locations": [37, -46]
+    },
+    {
+      "id": "WS0010",
+      "size": "SMALL",
+      "type": "MISSILE",
+      "mount": "HARDPOINT",
+      "arc": 0,
+      "angle": -45,
+      "locations": [65, -39]
+    },
+    {
+      "id": "LB 1",
+      "size": "LARGE",
+      "type": "LAUNCH_BAY",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [
+        -33.5, 58.5,
+        -31.5, 60.5
+      ]
+    },
+    {
+      "id": "LB 2",
+      "size": "LARGE",
+      "type": "LAUNCH_BAY",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [
+        -16.5, 28.5,
+        -13, 28.5
+      ]
+    },
+    {
+      "id": "LB 3",
+      "size": "LARGE",
+      "type": "LAUNCH_BAY",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [
+        -102.5, -2.5,
+        -104, -2.5
+      ]
+    },
+    {
+      "id": "LB 4",
+      "size": "LARGE",
+      "type": "LAUNCH_BAY",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [
+        -126, -2.5,
+        -128.5, -2.5
+      ]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-114.5, -58.5],
+      "length": 25,
+      "width": 7,
+      "angle": -180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-114.5, 53.5],
+      "length": 25,
+      "width": 7,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-129.5, -48],
+      "length": 30,
+      "width": 6,
+      "angle": -180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-129.5, 43],
+      "length": 30,
+      "width": 6,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-141.5, -39],
+      "length": 28,
+      "width": 8,
+      "angle": -180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-141.5, 34],
+      "length": 28,
+      "width": 8,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -156.5, 25.5,
+    -111, 64.5,
+    -11, 74,
+    58.5, 37.5,
+    176.5, 27.5,
+    176.5, -32.5,
+    58.5, -37.5,
+    -11, -74,
+    -111, -64.5,
+    -156.5, -25.5
+  ]
+}

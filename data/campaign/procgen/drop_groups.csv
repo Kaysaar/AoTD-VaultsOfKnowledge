@@ -14,9 +14,9 @@ item_drone_replicator,rare_tech,10
 item_dealmaker_holosuite,rare_tech,10
 research_databank,rare_tech,30
 item_coronal_portal,rare_tech,10
+item_aotd_aquaorb,rare_tech,10
 nothing,rare_tech,50%
 "#item_:{tags:[nanoforge]}, p:{}}",rare_tech,10
-,,
 ,,
 ,,
 ,,

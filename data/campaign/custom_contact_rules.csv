@@ -1,0 +1,6 @@
+id,trigger,conditions,script,text,options,notes
+myCasinoRefusal,AoTDCrystalCasinoInvite,$id == your_person_id,AoTDCrystalCasinoContacts blacklist,,,Replace your_person_id with the actual person ID
+myCasinoRefusalText,AoTDCrystalCasinoInviteResult,"$id == your_person_id
+$aotdCasinoInviteResult == blacklisted",,"""My work belongs here. Your penthouse will have to find another tenant.""",cutCommLink:Close the comm link,More specific than the generic refusal
+myCasinoAcceptanceText,AoTDCrystalCasinoInviteResult,"$id == another_person_id
+$aotdCasinoInviteResult == accepted",,"""A penthouse? I could get used to that. You know where to find me.""",cutCommLink:Close the comm link,Default hook already accepts; optional custom response

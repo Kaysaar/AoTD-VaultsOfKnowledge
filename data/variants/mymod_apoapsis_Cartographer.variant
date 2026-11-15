@@ -1,0 +1,70 @@
+{
+  "variantId": "mymod_apoapsis_Cartographer",
+  "hullId": "mymod_apoapsis",
+  "displayName": "Cartographer",
+  "goalVariant": true,
+  "fluxCapacitors": 0,
+  "fluxVents": 50,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [
+    "hardenedshieldemitter",
+    "targetingunit",
+    "expanded_deck_crew"
+  ],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0006": "plasma"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0007": "locust"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "ALTERNATING",
+      "weapons": {
+        "WS0009": "gorgon",
+        "WS0010": "gorgon"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0003": "heavyburst",
+        "WS0005": "pdburst"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0004": "taclaser"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0002": "irautolance"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "ionbeam"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}

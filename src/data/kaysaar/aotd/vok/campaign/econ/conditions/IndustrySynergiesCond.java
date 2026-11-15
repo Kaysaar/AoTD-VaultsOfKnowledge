@@ -45,10 +45,9 @@ public class IndustrySynergiesCond extends BaseMarketConditionPlugin {
         if (util == null) {
             util = new IntervalUtil(Global.getSector().getClock().getSecondsPerDay(), Global.getSector().getClock().getSecondsPerDay());
         }
-
-        IndustrySynergiesManager.getInstance().getSynergyScripts().forEach(x -> x.advance(market, amount, false));
         util.advance(amount);
         if (util.intervalElapsed()) {
+            IndustrySynergiesManager.getInstance().getSynergyScripts().forEach(x -> x.advance(market, util.getElapsed(), false));
             IndustrySynergiesManager.getInstance().getSynergyScripts().forEach(x -> x.endOfTheDay(market));
         }
 
