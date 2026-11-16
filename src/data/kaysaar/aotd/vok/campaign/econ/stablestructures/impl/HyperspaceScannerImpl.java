@@ -1,5 +1,6 @@
 package data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl;
 
+import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.InteractionDialogImageVisual;
 import com.fs.starfarer.api.campaign.FactionAPI;
@@ -33,8 +34,6 @@ public class HyperspaceScannerImpl extends AoTDStableStructureImpl {
         return token instanceof PlanetAPI
                 && Planets.ICE_GIANT.equals(((PlanetAPI) token).getTypeId());
     }
-
-    /** The global sprite registry keeps both illustrations in data/config/settings.json. */
     public String getScannerIllustration() {
         SectorEntityToken token = getCurrentlyTiedEntity();
         SectorEntityToken focus = token == null ? null : token.getOrbitFocus();
@@ -106,8 +105,15 @@ public class HyperspaceScannerImpl extends AoTDStableStructureImpl {
 
     @Override
     public boolean isAvailableToBuild(StarSystemAPI system, FactionAPI faction) {
+        if (faction == null || !AoTDMainResearchManager.getInstance()
+                .isAvailableForFaction("aotd_hyperwave_detection", faction)) return false;
         return system != null && faction != null && faction.isPlayerFaction()
                 && hasSuitableGiant(system) && !hasAnotherScanner(system);
+    }
+
+    @Override
+    public boolean showWhenUnavailable(StarSystemAPI system, FactionAPI faction) {
+        return false;
     }
 
     @Override
@@ -124,7 +130,7 @@ public class HyperspaceScannerImpl extends AoTDStableStructureImpl {
         return super.getUnavailableReason(system, faction);
     }
 
-    /** Validate the orbit focus even if construction is initiated outside the normal picker. */
+
     @Override
     public boolean startBuilding(String ultimateTargetId) {
         if (currentlyAssignedToken == null || !isSuitableGiant(currentlyAssignedToken.getOrbitFocus())) return false;

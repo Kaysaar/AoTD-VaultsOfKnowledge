@@ -1,5 +1,6 @@
 package data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl;
 
+import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
@@ -94,9 +95,16 @@ public class GnajidIndustrialStationImpl extends AoTDStableStructureImpl {
 
     @Override
     public boolean isAvailableToBuild(StarSystemAPI system, FactionAPI faction) {
+        if (faction == null || !AoTDMainResearchManager.getInstance()
+                .isAvailableForFaction("new_technology_2", faction)) return false;
         if (system == null || faction == null || !faction.isPlayerFaction()) return false;
         SectorEntityToken existing = findExistingStation();
         return existing == null || existing == currentlyAssignedToken;
+    }
+
+    @Override
+    public boolean showWhenUnavailable(StarSystemAPI system, FactionAPI faction) {
+        return false;
     }
 
     @Override

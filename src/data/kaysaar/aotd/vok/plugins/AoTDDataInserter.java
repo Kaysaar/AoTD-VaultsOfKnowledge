@@ -211,6 +211,7 @@ public class AoTDDataInserter {
         planet.getMarket().removeCondition(Conditions.RUINS_EXTENSIVE);
         planet.getMarket().removeCondition(Conditions.RUINS_SCATTERED);
         planet.getMarket().removeCondition(Conditions.RUINS_WIDESPREAD);
+        planet.getMarket().addCondition("aotd_crashed_ring_segmnets");
         planet.getMarket().getPrimaryEntity().setInteractionImage("illustrations","nidavelir_destroyed");
 
         if (!planet.getMarket().hasCondition(Conditions.RUINS_VAST)) {
@@ -298,6 +299,7 @@ public class AoTDDataInserter {
         planet.getMarket().removeCondition(Conditions.VERY_COLD);
         planet.getMarket().addCondition(Conditions.RARE_ORE_ULTRARICH);
         planet.getMarket().addCondition(Conditions.ORE_ULTRARICH);
+        planet.getMarket().addCondition("aotd_logistic_boneyards");
         planet.getMemoryWithoutUpdate().set("$aotd_mega_already", true);
         String t = planet.getMarket().addCondition("aotd_pluto_station");
         planet.getMarket().getSpecificCondition(t).setSurveyed(false);

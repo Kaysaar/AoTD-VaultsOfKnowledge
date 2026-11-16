@@ -7,7 +7,6 @@ import com.fs.starfarer.api.impl.campaign.aotd_entities.HypershuntReceiverEntity
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureImpl;
-import data.kaysaar.aotd.vok.Ids.AoTDTechIds;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 
 public class HypershuntReciverImpl extends AoTDStableStructureImpl {
@@ -20,7 +19,7 @@ public class HypershuntReciverImpl extends AoTDStableStructureImpl {
     @Override
     public boolean isAvailableToBuild(StarSystemAPI systemAPI, FactionAPI factionAttemptingToBuildIt) {
         return factionAttemptingToBuildIt != null && AoTDMainResearchManager.getInstance()
-                .isAvailableForFaction(AoTDTechIds.HP_ENERGY_DISTRIB, factionAttemptingToBuildIt);
+                .isAvailableForFaction("aotd_tech_hp_distribution", factionAttemptingToBuildIt);
     }
 
     @Override

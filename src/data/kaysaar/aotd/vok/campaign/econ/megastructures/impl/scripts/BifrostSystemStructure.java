@@ -1,5 +1,6 @@
 package data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts;
 
+import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureConstruction;
@@ -62,6 +63,8 @@ public class BifrostSystemStructure extends AoTDStableStructureImpl {
 
     @Override
     public boolean isAvailableToBuild(StarSystemAPI system, FactionAPI faction) {
+        if (faction == null || !AoTDMainResearchManager.getInstance()
+                .isAvailableForFaction("aotd_tech_bifrost_gate", faction)) return false;
         return getUnavailableReason(system,faction) == null;
     }
 
