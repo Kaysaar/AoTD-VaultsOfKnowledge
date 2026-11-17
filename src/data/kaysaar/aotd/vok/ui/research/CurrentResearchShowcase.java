@@ -134,6 +134,7 @@ public class CurrentResearchShowcase implements CustomUIPanelPlugin {
                             Industry cover = marketAPI.getIndustry("dummy_industry");
                             marketAPI.addIndustry(Industries.POPULATION);
                             marketAPI.addIndustry(entry.getKey());
+                            
                             marketAPI.reapplyConditions();
                             Industry ind = marketAPI.getIndustry(entry.getKey());
                             TooltipMakerAPI tooltipMakerAPI = Global.getSettings().createCustom(1,1,null).createUIElement(100,100,true);
