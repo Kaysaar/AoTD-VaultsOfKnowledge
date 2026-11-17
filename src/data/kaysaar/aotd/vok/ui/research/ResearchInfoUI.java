@@ -578,33 +578,8 @@ public class ResearchInfoUI extends PopUpUI {
     }
 
     public static MarketAPI initalizeMarket() {
-        if (Global.getSector().getMemory().get("$aotd_checkout_market")!=null) {
-            return (MarketAPI) Global.getSector().getMemory().get("$aotd_checkout_market");
-        } else {
-            MarketAPI marketToShowTooltip = Global.getFactory().createMarket("to_delete", "TEst", 6);
-            marketToShowTooltip.addCondition(Conditions.FARMLAND_ADEQUATE);
-            marketToShowTooltip.addCondition(Conditions.ORE_MODERATE);
-            marketToShowTooltip.addCondition(Conditions.RARE_ORE_MODERATE);
-            marketToShowTooltip.addCondition(Conditions.ORGANICS_COMMON);
-            marketToShowTooltip.addCondition(Conditions.VOLATILES_DIFFUSE);
-
-            marketToShowTooltip.addCondition("AoDFoodDemand");
-            marketToShowTooltip.addCondition(Conditions.VOLATILES_DIFFUSE);
-            marketToShowTooltip.addIndustry("dummy_industry");
-            marketToShowTooltip.setFactionId(Global.getSector().getPlayerFaction().getId());
-            marketToShowTooltip.reapplyConditions();
-            marketToShowTooltip.setFreePort(true);
-
-            for (CommodityOnMarketAPI allCommodity : marketToShowTooltip.getAllCommodities()) {
-                allCommodity.getAvailableStat().addTemporaryModFlat(10000, "src", 30);
-            }
-            marketToShowTooltip.setUseStockpilesForShortages(true);
-            Global.getSector().getMemory().set("$aotd_checkout_market", marketToShowTooltip);
-
-            return marketToShowTooltip;
-        }
+        return data.kaysaar.aotd.tot.misc.AoTDPreviewMarket.getMarket();
     }
-
 
     @Override
     public void onExit() {

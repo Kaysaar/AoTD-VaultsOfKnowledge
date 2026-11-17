@@ -14,6 +14,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
+import data.kaysaar.aotd.tot.misc.AoTDPreviewMarket;
 import data.kaysaar.aotd.vok.plugins.AoDUtilis;
 
 import data.kaysaar.aotd.vok.misc.AoTDMisc;
@@ -233,24 +234,7 @@ public class CurrentResearchShowcase implements CustomUIPanelPlugin {
     }
 
     public MarketAPI initalizeMarket(){
-        MarketAPI marketToShowTooltip = Global.getFactory().createMarket("to_delete","TEst",6);
-        marketToShowTooltip.addCondition(Conditions.FARMLAND_ADEQUATE);
-        marketToShowTooltip.addCondition(Conditions.ORE_MODERATE);
-        marketToShowTooltip.addCondition(Conditions.RARE_ORE_MODERATE);
-        marketToShowTooltip.addCondition(Conditions.ORGANICS_COMMON);
-        marketToShowTooltip.addCondition(Conditions.VOLATILES_DIFFUSE);
-
-        marketToShowTooltip.addCondition("AoDFoodDemand");
-        marketToShowTooltip.addCondition(Conditions.VOLATILES_DIFFUSE);
-        marketToShowTooltip.addIndustry("dummy_industry");
-        marketToShowTooltip.setFactionId(Global.getSector().getPlayerFaction().getId());
-        marketToShowTooltip.reapplyConditions();
-        marketToShowTooltip.setFreePort(true);
-        for (CommodityOnMarketAPI allCommodity : marketToShowTooltip.getAllCommodities()) {
-            allCommodity.getAvailableStat().addTemporaryModFlat(10000,"src",30);
-        }
-        marketToShowTooltip.setUseStockpilesForShortages(true);
-        return marketToShowTooltip;
+        return AoTDPreviewMarket.createMarket();
     }
     @Override
     public void positionChanged(PositionAPI position) {
