@@ -45,7 +45,8 @@ public class ResearchPanelComponent extends ButtonComponent {
             ImageViewer viewer = new ImageViewer(size,size,AoTDMisc.getImagePathForTechIcon(entry.getKey()));
             addComponent(viewer,currX,currY);
             TooltipMakerAPI tooltip = componentPanel.createUIElement(1,1,false);
-            if(entry.getValue().equals(ResearchRewardType.INDUSTRY) || entry.getValue().equals(ResearchRewardType.STABLESTRUCTURES)){
+            if(entry.getValue().equals(ResearchRewardType.INDUSTRY)
+                    || entry.getValue().equals(ResearchRewardType.STABLESTRUCTURES) || entry.getValue().equals(ResearchRewardType.RECIPE)){
                 ResearchInfoUI.createOnHoverTooltipForReward(tooltip,entry.getKey(),entry.getValue(),viewer.getTooltipOnHoverPanel());
             }
             if(entry.getValue().equals(ResearchRewardType.MODIFIER)){

@@ -27,8 +27,8 @@ public class PlasmaHarvester extends BaseIndustry {
         super.apply(true);
         int size = market.getSize();
         demand(Commodities.HEAVY_MACHINERY, size - 2);
-        demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY, size -4);
         demand(Commodities.DRUGS,  size - 2);
+        demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY, size -4);
         if(AoDUtilis.getVolatilesAmount(market)>=-1){
             supply(Commodities.VOLATILES,AoDUtilis.getVolatilesAmount(market)+(market.getSize()+3));
         }

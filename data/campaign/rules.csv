@@ -19,6 +19,7 @@ veil_salvage,DialogOptionSelected,$option == veil_salvage,BeyondQuest genLoot,,,
 bifrostPrintReceiver,bifrostCanBeUsed,$connected==true,,"Being connected with a Hypershunt, this gate is charged with the energy of a star, increasing its efficiency by no longer requiring a cooldown sequence to be executed after each use.",,
 bifrostAccess,OpenInteractionDialog,$customType == bifrost_gate score:1000,"SetShortcut defaultLeave ESCAPE  
 SetEnabled bifrostUse false
+BiFrostCMD setGateImage bifrost_inactive
 FireAll bifrostCanBeUsed
 BiFrostCMD printReqControlCenter","A dull hum begins to sound in your ear, emanating from the gate as space-time begins to rumble and roil. The dull interior of the gigantic ring slowly lightens, unnatural purple light drifting inwards even as the humming begins to rise in tempo, rising a roar. Waves and distortions, barely visible from a distance echo from the structure, sensor reports streaming in about conflicting celestial objects, before it reaches a crescendo. In a tide, space normalizes and a tunnel in reality itself forms to completion, giving a full glimpse to the other side.
 
@@ -28,7 +29,8 @@ bifrostUse,DialogOptionSelected,$option == bifrostUse,BiFrostCMD selectDestinati
 bifrostCanBeUsed,bifrostCanBeUsed,"$used==false
 $cooldown <=0
 $supplied == true
-BiFrostCMD doesHaveControlCenter",SetEnabled bifrostUse true,,,
+BiFrostCMD doesHaveControlCenter","SetEnabled bifrostUse true
+BiFrostCMD setGateImage bifrost",,,
 #END BIFROST SECTION,,,,,,
 ,,,,,,
 # Coronal Rework,,,,,,

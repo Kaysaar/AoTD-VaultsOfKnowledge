@@ -19,6 +19,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.Pair;
 import data.kaysaar.aotd.tot.grandwonders.GrandWonderAPI;
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipePlugin;
 import data.kaysaar.aotd.tot.grandwonders.GrandWonderManager;
 import data.kaysaar.aotd.tot.grandwonders.GrandWonderTypeManager;
 import data.kaysaar.aotd.vok.Ids.AoTDCommodities;
@@ -58,11 +59,12 @@ public class DaedalusArray extends Spaceport implements GrandWonderAPI {
         int extraSize = 0;
         if (megaport) extraSize = 5;
 
-        demand(Commodities.FUEL, size - 2 + extraSize);
+        demand(Commodities.FUEL, 2 * (size - 2 + extraSize));
         demand(Commodities.SUPPLIES, size - 2 + extraSize);
         demand(Commodities.SHIPS, size - 2 + extraSize);
 
         supply(Commodities.CREW, size + 2 + extraSize);
+        AoTDIndustryRecipePlugin.applyRecipeFromIndustry(this);
 
 
         String desc = getNameForModifier();
@@ -125,6 +127,7 @@ public class DaedalusArray extends Spaceport implements GrandWonderAPI {
 
     @Override
     public void unapply() {
+        AoTDIndustryRecipePlugin.unapplyRecipeFromIndustry(this);
         super.unapply();
         String id1 = "hypertopology1_aotd";
         String id2 = "hypertopology2_aotd";

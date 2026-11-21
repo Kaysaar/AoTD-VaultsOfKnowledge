@@ -12,6 +12,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.Pair;
 import data.kaysaar.aotd.tot.grandwonders.GrandWonderAPI;
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipePlugin;
 import data.kaysaar.aotd.tot.grandwonders.GrandWonderTypeManager;
 import data.kaysaar.aotd.vok.Ids.AoTDCommodities;
 import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
@@ -152,22 +153,16 @@ public class GardensOfElysium extends ResortCenter implements GrandWonderAPI {
         supply(Commodities.FOOD, quantity);
         supply(Commodities.LUXURY_GOODS, quantity - 2);
         demand(Commodities.HEAVY_MACHINERY, market.getSize() + 2);
-        if(AoTDMainResearchManager.getInstance().isAvailableForThisMarket(AoTDTechIds.FARMING_BOOST,market)){
-            demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY,market.getSize()-2);
-            float bonus = 1.5f;
-            int expected = market.getSize()-2;
-            int total = expected-getMaxDeficit(AoTDCommodities.DOMAIN_GRADE_MACHINERY).two;
-            if(total!=0&&expected!=0){
-                float have = (float) total /expected;
-                bonus = Math.max(1f,bonus*have);
-
-            }
-
-            getSupply(Commodities.FOOD).getQuantity().modifyMultAlways("aotd_food_bonus",bonus,"bonus");
-        }
         Pair<String, Integer> deficit = getMaxDeficit(Commodities.HEAVY_MACHINERY);
         //applyDeficitToProduction(0, deficit, Commodities.FOOD, Commodities.ORGANICS);
         applyDeficitToProduction(2, deficit, Commodities.FOOD, Commodities.LUXURY_GOODS);
+        AoTDIndustryRecipePlugin.applyRecipeFromIndustry(this);
+    }
+
+    @Override
+    public void unapply() {
+        AoTDIndustryRecipePlugin.unapplyRecipeFromIndustry(this);
+        super.unapply();
     }
 
     @Override

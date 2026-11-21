@@ -5,7 +5,7 @@
 		"nameInText":"bifrost gate",
 		"aOrAn":"an",
 		"defaultRadius":60, # used if radius<0 in addCustomEntity()
-		"interactionImage":"graphics/icons/megastructures/bifrost_upscaled.png",
+		"interactionImage":"graphics/illustrations/bifrost_active.png",
 		"icon":"graphics/icons/gate0.png",
 		"iconWidth":20,
 		"iconHeight":20,

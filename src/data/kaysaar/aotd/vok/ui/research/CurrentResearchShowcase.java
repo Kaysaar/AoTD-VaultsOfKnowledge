@@ -65,7 +65,7 @@ public class CurrentResearchShowcase implements CustomUIPanelPlugin {
             for (Map.Entry<String, ResearchRewardType> entry : option.getSpec().getRewards().entrySet()) {
                 ImageViewer viewers = new ImageViewer(size,size,AoTDMisc.getImagePathForTechIcon(entry.getKey()));
                 tooltip.addCustom(viewers.getComponentPanel(),0f).getPosition().inTL(currX,currY);
-                if (entry.getValue() == ResearchRewardType.STABLESTRUCTURES) {
+                if (entry.getValue() == ResearchRewardType.STABLESTRUCTURES || entry.getValue() == ResearchRewardType.RECIPE) {
                     ResearchInfoUI.createOnHoverTooltipForReward(tooltip, entry.getKey(), entry.getValue(), viewers.getTooltipOnHoverPanel());
                 }
                 currX += xSpacing+size;
@@ -113,7 +113,7 @@ public class CurrentResearchShowcase implements CustomUIPanelPlugin {
             for (final Map.Entry<String, ResearchRewardType> entry : option.getSpec().getRewards().entrySet()) {
                 ImageViewer viewers = new ImageViewer(size,size,AoTDMisc.getImagePathForTechIcon(entry.getKey()));
                 tooltip.addCustom(viewers.getComponentPanel(),0f).getPosition().inTL(currX,currY);
-                if (entry.getValue() == ResearchRewardType.STABLESTRUCTURES) {
+                if (entry.getValue() == ResearchRewardType.STABLESTRUCTURES || entry.getValue() == ResearchRewardType.RECIPE) {
                     ResearchInfoUI.createOnHoverTooltipForReward(tooltip, entry.getKey(), entry.getValue(), viewers.getTooltipOnHoverPanel());
                 }
                 if (entry.getValue().equals(ResearchRewardType.INDUSTRY)){

@@ -22,9 +22,9 @@ public class WormholeStabilizer extends CoronalSegment{
     @Override
     public void applyDemandForRepair() {
         super.applyDemandForRepair();
-        demand(AoTDCommodities.REFINED_METAL,10);
         demand(Commodities.METALS,8);
         demand(Commodities.RARE_METALS,6);
+        demand(AoTDCommodities.REFINED_METAL,10);
     }
     @Override
     public void applyUpkeepWithRebuilding() {

@@ -18,7 +18,6 @@ public class HighTechIndustry extends BaseIndustry {
         demand(Commodities.ORGANICS, size+2);
         demand(Commodities.HEAVY_MACHINERY,size);
         demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY,size-3);
-        supply(AoTDCommodities.ADVANCED_COMPONENTS, getAdvancedComponents()+1);
         //supply(Commodities.SUPPLIES, size - 3);
 
         //if (!market.getFaction().isIllegal(Commodities.LUXURY_GOODS)) {
@@ -27,6 +26,7 @@ public class HighTechIndustry extends BaseIndustry {
         } else {
             supply(Commodities.LUXURY_GOODS, 0);
         }
+        supply(AoTDCommodities.ADVANCED_COMPONENTS, getAdvancedComponents()+1);
         //if (!market.getFaction().isIllegal(Commodities.DRUGS)) {
 
         Pair<String, Integer> deficit = getMaxDeficit(Commodities.ORGANICS,Commodities.HEAVY_MACHINERY,AoTDCommodities.DOMAIN_GRADE_MACHINERY);

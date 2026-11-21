@@ -181,8 +181,9 @@ public class ResearchOptionSpec {
         HashMap<String, ResearchRewardType> toReturn = new HashMap<>();
         String[] rewards = csvEntry.split("\n");
         for (String reward : rewards) {
-            String[] splitedReward = reward.split(":");
-            toReturn.put(splitedReward[0], getType(splitedReward[1]));
+            String[] splitedReward = reward.split(":", 2);
+            if (splitedReward.length != 2 || splitedReward[0].trim().isEmpty()) continue;
+            toReturn.put(splitedReward[0].trim(), getType(splitedReward[1]));
         }
         return toReturn;
     }
@@ -190,6 +191,7 @@ public class ResearchOptionSpec {
     public static ResearchRewardType getType(String type) {
         String trimedType = type.trim().toLowerCase();
         if (trimedType.equals("stablestructures") || trimedType.equals("stablestructure")) return ResearchRewardType.STABLESTRUCTURES;
+        if (trimedType.equals("recipe")) return ResearchRewardType.RECIPE;
         if (trimedType.equals("industry")) return ResearchRewardType.INDUSTRY;
         if (trimedType.equals("ship")) return ResearchRewardType.SHIP;
         if (trimedType.equals("weapon")) return ResearchRewardType.WEAPON;

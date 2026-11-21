@@ -31,7 +31,7 @@ public class BifrostMainUI implements ExtendedUIPanelPlugin {
             infoSection.clearUI();
             gateSection.clearUI();
         }
-        infoSection = new BifrostInfoSection(this);
+        infoSection = new BifrostInfoSection();
         gateSection = new BifrostGateListSection();
         componentPanel.addComponent(infoSection.getMainPanel()).inTL(componentPanel.getPosition().getWidth()-infoSection.getMainPanel().getPosition().getWidth(),0);
         componentPanel.addComponent(gateSection.getMainPanel()).inTL(0,0);

@@ -34,21 +34,21 @@ public class MiningMegaplex extends BaseIndustry {
             bonus=3;
         }
         int size = market.getSize();
-        if(AoDUtilis.getOrganicsAmount(market)>=-1){
-            supply(Commodities.ORGANICS,AoDUtilis.getOrganicsAmount(market)+(market.getSize()+3)+bonus);
-        }
         if(AoDUtilis.getNormalOreAmount(market)>=-1){
             supply(Commodities.ORE,AoDUtilis.getNormalOreAmount(market)+(market.getSize()+3)+bonus);
         }
         if(AoDUtilis.getRareOreAmount(market)>=-1){
             supply(Commodities.RARE_ORE,AoDUtilis.getRareOreAmount(market)+(market.getSize()+2)+bonus);
         }
+        if(AoDUtilis.getOrganicsAmount(market)>=-1){
+            supply(Commodities.ORGANICS,AoDUtilis.getOrganicsAmount(market)+(market.getSize()+3)+bonus);
+        }
         if(AoDUtilis.getVolatilesAmount(market)>=-1){
             supply(Commodities.VOLATILES,AoDUtilis.getVolatilesAmount(market)+(market.getSize()+3)+bonus);
         }
         demand(Commodities.HEAVY_MACHINERY,market.getSize()+4);
-        demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY,Math.max(1,market.getSize()-4));
         demand(Commodities.DRUGS,market.getSize()+2);
+        demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY,Math.max(1,market.getSize()-4));
         Pair<String, Integer> deficit = getMaxDeficit(Commodities.DRUGS, Commodities.HEAVY_MACHINERY,AoTDCommodities.DOMAIN_GRADE_MACHINERY);
         applyDeficitToProduction(2, deficit,
                 Commodities.ORE,Commodities.ORGANICS,Commodities.RARE_ORE,Commodities.VOLATILES);

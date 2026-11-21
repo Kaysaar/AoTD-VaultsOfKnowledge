@@ -1,6 +1,7 @@
 package data.kaysaar.aotd.vok.plugins;
 
 
+import ashlib.data.plugins.events.AshlibBaseEventManager;
 import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
@@ -33,6 +34,7 @@ import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelo
 
 
 import data.kaysaar.aotd.vok.campaign.econ.grandprojects.BiosphereType;
+import data.kaysaar.aotd.vok.campaign.econ.grandprojects.DangerousType;
 import data.kaysaar.aotd.vok.campaign.econ.grandprojects.SpaceDefenceStationType;
 import data.kaysaar.aotd.vok.campaign.econ.grandprojects.SpaceTransportationType;
 import data.kaysaar.aotd.vok.campaign.econ.grandprojects.TechnologyType;
@@ -52,6 +54,7 @@ import data.kaysaar.aotd.vok.campaign.econ.synergies.impl.sources.*;
 import data.kaysaar.aotd.vok.campaign.econ.synergies.impl.synergies.*;
 import data.kaysaar.aotd.vok.campaign.econ.synergies.models.IndustrySynergiesManager;
 import data.kaysaar.aotd.vok.campaign.econ.synergies.ui.SynergyUiInjector;
+import data.kaysaar.aotd.vok.events.AbyssalColonizationProposal;
 import data.kaysaar.aotd.vok.hullmods.AoTDShroudedLensHullmod;
 import data.kaysaar.aotd.vok.hullmods.AoTDShroudedMantleHullmod;
 import data.kaysaar.aotd.vok.hullmods.AoTDShroudedThunderHeadHullmod;
@@ -82,6 +85,7 @@ import data.kaysaar.aotd.vok.timeline.military.TierFourStationHighTechEvent;
 import data.kaysaar.aotd.vok.timeline.military.TierFourStationLowTechEvent;
 import data.kaysaar.aotd.vok.timeline.prosperity.DadelousArrayEvent;
 import data.kaysaar.aotd.vok.timeline.prosperity.GardensOfElysiumEvent;
+import data.kaysaar.aotd.vok.timeline.unique.FirstGrandWonderEvent;
 import data.kaysaar.aotd.vok.timeline.prosperity.MiningMegaplexEvent;
 import data.kaysaar.aotd.vok.timeline.prosperity.ResortCenterWorld;
 import data.kaysaar.aotd.vok.timeline.research.JanusDeviceEvent;
@@ -208,6 +212,7 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
         GrandWonderTypeManager.addNewSpec(new SpaceDefenceStationType());
         GrandWonderTypeManager.addNewSpec(new BiosphereType());
         GrandWonderTypeManager.addNewSpec(new TechnologyType());
+        GrandWonderTypeManager.addNewSpec(new DangerousType());
         AoTDProductionSpecManager.addListener("item_influence",new AoTDSpecInfluencer());
     }
     public static boolean moveFileIntoStuffSubdirInModGraphics(String modId, String absolutePath) {
@@ -353,6 +358,7 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
         Global.getSettings().getIndustrySpec(Industries.HEAVYINDUSTRY).setPluginClass(AoTDHeavyIndustry.class.getName());
         Global.getSettings().getIndustrySpec(Industries.ORBITALWORKS).setPluginClass(AoTDHeavyIndustry.class.getName());
         Global.getSettings().getIndustrySpec(Industries.AQUACULTURE).addTag("aquaculture");
+        Global.getSettings().getIndustrySpec("aotd_spaceframe_foundry").addTag(AoTDTags.AOTD_SUPPORT_RECIPE_DIRECTLY);
 
         if (Global.getSettings().getModManager().isModEnabled("uaf")) {
             aoTDSpecialItemRepo.setSpecialItemNewIndustries("uaf_rice_cooker", "aotd_subsidised_farming");
@@ -571,16 +577,13 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
     public void onGameLoad(boolean newGame) {
 
         super.onGameLoad(newGame);
-        if (Global.getSettings().getModManager().isModEnabled("aotd_theory_of_toolbox")) {
-            CrystalCasinoGuestManager.register();
-        }
-        if (Global.getSettings().getModManager().isModEnabled("aotd_theory_of_toolbox")) {
-            BifrostSystemStructure.restoreExistingGates();
-        }
+        CrystalCasinoGuestManager.register();
+        BifrostSystemStructure.restoreExistingGates();
+        OrbitalConfigurationTheoryListener.register();
+
         if(Global.getSettings().isDevMode()){
             MegastructureSpecManager.init();
         }
-
         PlayerIssuedSupplyContract.fullProdCommodities.add(AoTDCommodities.COMPOUND);
         for (MarketAPI marketAPI : Global.getSector().getEconomy().getMarketsCopy()) {
             marketAPI.removeCondition("aotd_growing_demand_applier");
@@ -604,15 +607,9 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
         Global.getSector().addTransientScript(new IndustryTooltipPlacer());
         Global.getSector().addTransientListener(new AoTDxUafAfterCombatListener());
         Global.getSector().addTransientListener(new AoTDCampaignListener());
-        try {
-            aoTDDataInserter.insertSpecItemsForMacroIndustrialComplexData();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         aoTDDataInserter.insertSophia();
         setListenersIfNeeded();
+        AshlibBaseEventManager.getInstance().addEvent(new AbyssalColonizationProposal());
 //        for (Map.Entry<String, MagicAchievement> stringMagicAchievementEntry : MagicAchievementManager.getInstance().getAchievements().entrySet()) {
 //            stringMagicAchievementEntry.getValue().uncompleteAchievement(true);
 //        }
@@ -782,6 +779,8 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new TierFourStationHighTechEvent(null)));
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new DadelousArrayEvent(null)));
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new GardensOfElysiumEvent(null)));
+        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new FirstGrandWonderEvent("aotd_persean_university")));
+        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new FirstGrandWonderEvent("aotd_charon_ferry")));
 
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new ResortCenterWorld(null)));
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new MiningMegaplexEvent(null)));

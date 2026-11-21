@@ -4,6 +4,7 @@ import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipePlugin;
 import data.kaysaar.aotd.vok.Ids.AoTDTechIds;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 
@@ -13,11 +14,12 @@ public class MaglevNetwork extends BaseIndustry {
     @Override
     public void apply() {
         super.apply(true);
-
+        AoTDIndustryRecipePlugin.applyRecipeFromIndustry(this);
     }
 
     @Override
     public void unapply() {
+        AoTDIndustryRecipePlugin.unapplyRecipeFromIndustry(this);
         super.unapply();
     }
 

@@ -19,14 +19,14 @@ public class ExtractiveOperation extends BaseIndustry {
         int size = market.getSize();
         demand(Commodities.HEAVY_MACHINERY, size - 2);
         demand(Commodities.DRUGS,  size - 2);
-        if(AoDUtilis.getOrganicsAmount(market)>=-1){
-            supply(Commodities.ORGANICS,(AoDUtilis.getOrganicsAmount(market)+(market.getSize()-2)));
-        }
         if(AoDUtilis.getNormalOreAmount(market)>=-1){
             supply(Commodities.ORE,(AoDUtilis.getNormalOreAmount(market)+(market.getSize()-2)));
         }
         if(AoDUtilis.getRareOreAmount(market)>=0){
             supply(Commodities.RARE_ORE,(AoDUtilis.getRareOreAmount(market)));
+        }
+        if(AoDUtilis.getOrganicsAmount(market)>=-1){
+            supply(Commodities.ORGANICS,(AoDUtilis.getOrganicsAmount(market)+(market.getSize()-2)));
         }
 
         Pair<String, Integer> deficit = getMaxDeficit(Commodities.DRUGS, Commodities.HEAVY_MACHINERY);

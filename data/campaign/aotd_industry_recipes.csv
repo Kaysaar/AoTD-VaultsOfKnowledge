@@ -1,0 +1,14 @@
+id,name,industryTiedTo,pluginClass
+aotd_artisanal_domain_cultivation,Domain-Grade Artisanal Cultivation,aotd_artisanal_farming,data.kaysaar.aotd.vok.campaign.econ.recipes.DomainMachineryRecipe
+aotd_subsidised_domain_cultivation,Domain-Grade Subsidised Cultivation,aotd_subsidised_farming,data.kaysaar.aotd.vok.campaign.econ.recipes.DomainMachineryRecipe
+aotd_commercial_domain_production,Domain-Grade Commercial Production,aotd_commercial_manu,data.kaysaar.aotd.vok.campaign.econ.recipes.DomainMachineryRecipe
+aotd_neurochemical_domain_production,Domain-Grade Neurochemical Production,aotd_druglight,data.kaysaar.aotd.vok.campaign.econ.recipes.DomainMachineryRecipe
+aotd_crystalizator_premium,Precision Crystallization,aotd_crystalizator,data.kaysaar.aotd.vok.campaign.econ.recipes.MetalOutputRecipe
+aotd_crystalizator_bulk,Bulk Metal Casting,aotd_crystalizator,data.kaysaar.aotd.vok.campaign.econ.recipes.MetalOutputRecipe
+aotd_enrichment_premium,Isotope Concentration,aotd_enrichment_facility,data.kaysaar.aotd.vok.campaign.econ.recipes.MetalOutputRecipe
+aotd_enrichment_bulk,Bulk Transplutonic Recovery,aotd_enrichment_facility,data.kaysaar.aotd.vok.campaign.econ.recipes.MetalOutputRecipe
+aotd_maglev_domain_maintenance,Domain-Grade Rail Maintenance,aotd_maglev,data.kaysaar.aotd.vok.campaign.econ.recipes.MaglevMaintenanceRecipe
+aotd_elysian_domain_cultivation,Domain-Grade Elysian Cultivation,aotd_garden_of_elysium,data.kaysaar.aotd.vok.campaign.econ.recipes.DomainMachineryRecipe
+aotd_megaport_compound_refuelling,Compound-Assisted Refuelling,megaport,data.kaysaar.aotd.vok.campaign.econ.recipes.CompoundRefuellingRecipe
+aotd_daedalus_compound_refuelling,Compound-Assisted Orbital Refuelling,aotd_daedalus_array,data.kaysaar.aotd.vok.campaign.econ.recipes.CompoundRefuellingRecipe
+aotd_supertensile_fabrication,Supertensile Spaceframe Fabrication,aotd_spaceframe_foundry,data.kaysaar.aotd.vok.campaign.econ.recipes.SupertensileFabricationRecipe

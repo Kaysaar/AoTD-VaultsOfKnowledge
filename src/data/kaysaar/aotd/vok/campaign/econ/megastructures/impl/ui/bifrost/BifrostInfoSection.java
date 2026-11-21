@@ -1,6 +1,5 @@
 package data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.ui.bifrost;
 
-import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
@@ -11,7 +10,6 @@ import data.kaysaar.aotd.vok.campaign.econ.megastructures.dialogs.base.BaseMegas
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.dialogs.components.MegastructureSectionButton;
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostMegastructure;
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostMegastructureManager;
-import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.ui.bifrost.gatebuilding.BifrostStarSystemSelectorDialog;
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.models.BaseMegastructureScript;
 
 import java.awt.*;
@@ -20,12 +18,9 @@ import java.util.List;
 public class BifrostInfoSection implements ExtendedUIPanelPlugin {
     CustomPanelAPI mainPanel,componentPanel;
     UILinesRenderer renderer;
-    BifrostMainUI mainUI;
-    ButtonAPI addGate;
 
-    public BifrostInfoSection(BifrostMainUI mainUI){
+    public BifrostInfoSection(){
         renderer = new UILinesRenderer(0f);
-        this.mainUI = mainUI;
         mainPanel = Global.getSettings().createCustom(410, BaseMegastructureTestDialog.height-45, this);
         renderer.setPanel(mainPanel);
         createUI();
@@ -67,14 +62,8 @@ public class BifrostInfoSection implements ExtendedUIPanelPlugin {
             String per = Misc.getRoundedValueMaxOneAfterDecimal(bonus)+"%";
             tooltip.addPara("Total accessibility bonus across entire empire : %s",3f,Color.ORANGE,per);
         }
-        addGate = null;
-        if (Global.getSettings().getModManager().isModEnabled("aotd_theory_of_toolbox")) {
-            tooltip.addPara("New Bifrost Gates must be constructed through the %s menu in the selected star system.",10f,Misc.getHighlightColor(),"System Structures");
-            tooltip.addPara("Bifrost Gates connect isolated systems to the rest of the Sector. Removing the gate restores the system's isolation.",5f);
-        }
-        else {
-        addGate = tooltip.addButton("Order construction of new gate",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID,CutStyle.TL_BR,componentPanel.getPosition().getWidth()-15,25,10f);
-        }
+        tooltip.addPara("New Bifrost Gates must be constructed through the %s menu in the selected star system.",10f,Misc.getHighlightColor(),"System Structures");
+        tooltip.addPara("Bifrost Gates connect isolated systems to the rest of the Sector. Removing the gate restores the system's isolation.",5f);
 
         componentPanel.addUIElement(tooltip).inTL(0,0);
         mainPanel.addComponent(componentPanel).inTL(0,0);
@@ -102,11 +91,6 @@ public class BifrostInfoSection implements ExtendedUIPanelPlugin {
 
     @Override
     public void advance(float amount) {
-        if(addGate!=null&& addGate.isChecked()){
-            addGate.setChecked(false);
-            BifrostStarSystemSelectorDialog dialog = new BifrostStarSystemSelectorDialog("Choose system to build Bifrost Gate", mainUI);
-            AshMisc.initPopUpDialog(dialog,800,420);
-        }
     }
 
     @Override

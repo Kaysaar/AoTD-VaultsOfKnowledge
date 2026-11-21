@@ -121,6 +121,7 @@
 			"refining_sub":"graphics/icons/tech/subicon_refinery.png",
 			"heavyindustry_sub":"graphics/icons/tech/subicon_heavyindustry.png",
 			"orbitalworks_sub":"graphics/icons/tech/subicon_orbitalworks.png",
+			"aotd_spaceframe_foundry_sub":"graphics/icons/tech/aotd_spaceframe_foundry_sub.png",
 			"aotd_artisanal_farming_sub":"graphics/icons/tech/subicon_artisinal.png",
 			"aotd_subsidised_farming_sub":"graphics/icons/tech/subicon_subsidised.png",
 			"aotd_monoculture_plots_sub":"graphics/icons/tech/subicon_monoculture.png",
@@ -255,7 +256,8 @@
 		"megastructureImage":{
             "hypershunt":"graphics/illustrations/coronal_tap.jpg",
 			"nidavelir":"graphics/illustrations/nidavelir.png",
-			"bifrost":"graphics/illustrations/active_gate.jpg",
+			"bifrost":"graphics/illustrations/bifrost_active.png",
+			"bifrost_inactive":"graphics/illustrations/bifrost_non_active.png",
 			"pluto":"graphics/illustrations/pluto.png",
 			"pluto_active":"graphics/illustrations/pluto_active.png"
 

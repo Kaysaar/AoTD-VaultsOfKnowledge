@@ -63,8 +63,8 @@ public class PlasmaCollector extends CoronalSegment{
     @Override
     public void applyDemandForRepair() {
         super.applyDemandForRepair();
-        demand(AoTDCommodities.REFINED_METAL,10);
         demand(Commodities.METALS,6);
+        demand(AoTDCommodities.REFINED_METAL,10);
     }
 
     @Override

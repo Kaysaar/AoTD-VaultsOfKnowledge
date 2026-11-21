@@ -30,7 +30,6 @@ public class AoTDMainResearchManager {
         return factionResearchManagers;
     }
 
-    public static String specialProjetsPath = "data/campaign/aotd_research_project.csv";
 
     HashMap<String, Float> weight = new HashMap<>();
     public ArrayList<String> modIDsRepo = new ArrayList<>();
@@ -79,28 +78,8 @@ public class AoTDMainResearchManager {
 
     }
 
-    public static @NotNull Map<String, ResearchProjectSpec> getResearchProjectSpecFromFiles() {
-        Map<String, ResearchProjectSpec> newEventSpecs = new HashMap<>();
-        JSONArray projectCsvFromMod;
-        try {
-            projectCsvFromMod = Global.getSettings().getMergedSpreadsheetDataForMod("id", specialProjetsPath, "aotd_vok");
-            for (int i = 0; i < projectCsvFromMod.length(); i++) {
-                JSONObject obj = projectCsvFromMod.getJSONObject(i);
-                ResearchProjectSpec spec = ResearchProjectSpec.initSpecFromJson(obj);
-                if (spec != null) {
-                    newEventSpecs.put(spec.getId(), spec);
-                }
 
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
 
-        return newEventSpecs;
-
-    }
 
     public void updateModIdRepo() {
         if (modIDsRepo == null) modIDsRepo = new ArrayList<>();
@@ -138,63 +117,9 @@ public class AoTDMainResearchManager {
         return newResearchOptionsIds;
     }
 
-    public static @NotNull ArrayList<ResearchProject> generateResearchProjects(@NotNull Map<String, ResearchProjectSpec> specs) {
-        ArrayList<ResearchProject> researchProjects = new ArrayList<>();
-        for (ResearchProjectSpec value : specs.values()) {
-            try {
-                final Class<?> eventPlugin = Global.getSettings().getScriptClassLoader().loadClass(value.getPlugin());
-                if (!ResearchProject.class.isAssignableFrom(eventPlugin)) {
-                    throw new RuntimeException(String.format("%s does not extend %s", eventPlugin.getCanonicalName(), ResearchProject.class.getCanonicalName()));
-                }
-                ResearchProject project = (ResearchProject) eventPlugin.newInstance();
-                project.init(value);
-                researchProjects.add(project);
-            } catch (Exception e) {
-                throw new RuntimeException("Sth fucked");
-            }
-        }
-        return researchProjects;
-    }
-
-    public ResearchProject getResearchProjectFromRepo(String id) {
-        for (ResearchProject project : researchProjects) {
-            if (project.id.equals(id)) {
-                return project;
-            }
-        }
-        return null;
-    }
-
     public void updateResearchOptionsFromSpec() {
         researchOptionSpec.clear();
         researchOptionSpec = getSpecsFromFiles();
-        researchProjectSpec.clear();
-        researchProjectSpec = getResearchProjectSpecFromFiles();
-        ArrayList<ResearchProject> dummyList = generateResearchProjects(researchProjectSpec);
-        for (ResearchProject researchProject : dummyList) {
-            ResearchProject original = getResearchProjectFromRepo(researchProject.id);
-            if (original == null) continue;
-            researchProject.currentlyOngoing = original.currentlyOngoing;
-            researchProject.haveDoneIt = original.haveDoneIt;
-            researchProject.optionsTakenIds = original.optionsTakenIds;
-            researchProject.currentValueOfOptions = original.currentValueOfOptions;
-            researchProject.haveMetReqOnce = original.haveMetReqOnce;
-            researchProject.currentProgress = original.currentProgress;
-            researchProject.haveReachedCriticalMoment = original.haveReachedCriticalMoment;
-            for (SpecialProjectStage stageNew : researchProject.stages) {
-                if (original.getCertainStage(stageNew.numberOfStage) != null) {
-                    stageNew.chosenOption = original.getCertainStage(stageNew.numberOfStage).chosenOption;
-                    if (stageNew.chosenOption != null) {
-                        stageNew.ensureDecisionExist();
-                    }
-
-                }
-
-            }
-
-        }
-        researchProjects.clear();
-        researchProjects.addAll(dummyList);
         for (AoTDFactionResearchManager factionResearchManager : factionResearchManagers) {
             for (ResearchOption option : factionResearchManager.getResearchRepoOfFaction()) {
                 ResearchOptionSpec spec = getSpecForSpecificResearch(option.Id);
@@ -288,8 +213,6 @@ public class AoTDMainResearchManager {
     private static void setInstance() {
         AoTDMainResearchManager manager = new AoTDMainResearchManager();
         manager.researchOptionSpec = getSpecsFromFiles();
-        manager.researchProjectSpec = getResearchProjectSpecFromFiles();
-        manager.researchProjects = generateResearchProjects(manager.researchProjectSpec);
         manager.initalizeFactionManagers();
         manager.saveData();
     }
@@ -393,6 +316,18 @@ public class AoTDMainResearchManager {
         if(factionAPI==null)return false;
         return getSpecificFactionManager(factionAPI).haveResearched(id);
     }
+    public String getMissingRecipeResearch(String recipeId, MarketAPI market) {
+        String missingResearch = null;
+        for (ResearchOptionSpec spec : researchOptionSpec.values()) {
+            if (spec.getRewards().get(recipeId) != ResearchRewardType.RECIPE) continue;
+            if (isAvailableForThisMarket(spec.getId(), market)) return null;
+            if (missingResearch == null || spec.getName().compareTo(missingResearch) < 0) {
+                missingResearch = spec.getName();
+            }
+        }
+        return missingResearch;
+    }
+
     public boolean isAvailableForThisMarket(String id, MarketAPI market) {
         if(market==null)return true;
         if (getSpecificFactionManager(market.getFaction()) == null) return false;

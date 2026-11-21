@@ -10,6 +10,7 @@ import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
+import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
@@ -17,6 +18,8 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipeManager;
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipePlugin;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureImpl;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureSpec;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureSpecManager;
@@ -112,6 +115,11 @@ public class ResearchInfoUI extends PopUpUI {
         if (structures != null) {
             mainPanel.addComponent(structures).inTL(0, lastY);
             lastY += structures.getPosition().getHeight() + 5;
+        }
+        CustomPanelAPI recipes = createWidgetForRewards(mainPanel, ResearchRewardType.RECIPE);
+        if (recipes != null) {
+            mainPanel.addComponent(recipes).inTL(0, lastY);
+            lastY += recipes.getPosition().getHeight() + 5;
         }
         CustomPanelAPI widget2 = createSectionForSpecialEffects(mainPanel);
         if (widget2 != null) {
@@ -333,6 +341,21 @@ public class ResearchInfoUI extends PopUpUI {
         if (rewardIds.isEmpty()) return null;
 
         float width = originPanel.getPosition().getWidth();
+        if (type == ResearchRewardType.RECIPE) {
+            CustomPanelAPI panel = originPanel.createCustomPanel(width, 1f, null);
+            TooltipMakerAPI tooltip = panel.createUIElement(width, 1f, false);
+            tooltip.setBulletedListMode(BaseIntelPlugin.BULLET);
+            for (String rewardId : rewardIds) {
+                AoTDIndustryRecipePlugin recipe = AoTDIndustryRecipeManager.getInstance().getRecipe(rewardId);
+                LabelAPI label = tooltip.addPara(recipe == null ? rewardId : recipe.getName(),Color.ORANGE, 3f);
+                createOnHoverTooltipForReward(tooltip, rewardId, type, label);
+            }
+            tooltip.setBulletedListMode(null);
+            panel.getPosition().setSize(width, tooltip.getHeightSoFar());
+            tooltip.getPosition().setSize(width, tooltip.getHeightSoFar());
+            panel.addUIElement(tooltip).inTL(0, 0);
+            return panel;
+        }
         float cardWidth = 190f;
         float cardHeight = 95f;
         float titleSpace = 20f;
@@ -377,6 +400,17 @@ public class ResearchInfoUI extends PopUpUI {
 
             @Override
             public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                if (type == ResearchRewardType.RECIPE) {
+                    AoTDIndustryRecipePlugin recipe = AoTDIndustryRecipeManager.getInstance().getRecipe(industryId);
+                    tooltip.addTitle(recipe == null ? industryId : recipe.getName(), Color.ORANGE);
+                    if (recipe == null) {
+                        tooltip.addPara("This production recipe is not registered.", Misc.getNegativeHighlightColor(), 5f);
+                        return;
+                    }
+                    tooltip.addPara("Unlocks a production recipe for %s.", 5f, Misc.getHighlightColor(),
+                            Global.getSettings().getIndustrySpec(recipe.getIndustryTiedTo()).getName());
+                    return;
+                }
                 if (type == ResearchRewardType.STABLESTRUCTURES) {
                     AoTDStableStructureSpec spec = AoTDStableStructureSpecManager.getSpec(industryId);
                     if (spec == null) {

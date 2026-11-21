@@ -9,7 +9,7 @@ import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.Pair;
-import data.kaysaar.aotd.vok.Ids.AoTDCommodities;
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipePlugin;
 import data.kaysaar.aotd.vok.Ids.AoTDTechIds;
 import data.kaysaar.aotd.vok.plugins.AoDUtilis;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
@@ -38,28 +38,14 @@ public class ArtisanalFarming extends BaseIndustry {
             }
         }
         int quantity = market.getSize() - 2;
-        supply(Commodities.LUXURY_GOODS, quantity);
         supply(Commodities.FOOD, quantity);
+        supply(Commodities.LUXURY_GOODS, quantity);
         for (Pair<String, Integer> farmingCondition : FARMING_CONDITIONS) {
             Pair<String, Integer> prodBonus = AoDUtilis.getProductionBonusFromCondition(market, farmingCondition.one, farmingCondition.two);
             if (prodBonus != null) {
-                supply(prodBonus.one,Commodities.LUXURY_GOODS, prodBonus.two, prodBonus.one);
                 supply(prodBonus.one,Commodities.FOOD, prodBonus.two, prodBonus.one);
+                supply(prodBonus.one,Commodities.LUXURY_GOODS, prodBonus.two, prodBonus.one);
             }
-        }
-        if(AoTDMainResearchManager.getInstance().isAvailableForThisMarket(AoTDTechIds.FARMING_BOOST,market)){
-            demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY,market.getSize()-2);
-            float bonus = 1.5f;
-            int expected = market.getSize()-2;
-            int total = expected-getMaxDeficit(AoTDCommodities.DOMAIN_GRADE_MACHINERY).two;
-            if(total!=0&&expected!=0){
-                float have = (float) total /expected;
-                bonus = Math.max(1f,bonus*have);
-
-            }
-
-            getSupply(Commodities.FOOD).getQuantity().modifyMultAlways("aotd_food_bonus",bonus,"bonus");
-            getSupply(Commodities.LUXURY_GOODS).getQuantity().modifyMultAlways("aotd_food_bonus",bonus,"bonus");
         }
 
         demand(Commodities.HEAVY_MACHINERY, market.getSize() - 3);
@@ -68,6 +54,7 @@ public class ArtisanalFarming extends BaseIndustry {
         applyDeficitToProduction(2, deficit, Commodities.FOOD, Commodities.LUXURY_GOODS);
 
 
+        AoTDIndustryRecipePlugin.applyRecipeFromIndustry(this);
         if (!isFunctional()) {
             supply.clear();
         }
@@ -81,6 +68,7 @@ public class ArtisanalFarming extends BaseIndustry {
 
     @Override
     public void unapply() {
+        AoTDIndustryRecipePlugin.unapplyRecipeFromIndustry(this);
         super.unapply();
     }
 

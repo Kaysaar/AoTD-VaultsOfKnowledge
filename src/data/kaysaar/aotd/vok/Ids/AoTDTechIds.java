@@ -19,6 +19,7 @@ public class AoTDTechIds {
     public static final String ADVANCED_MINING_EQUIPMENT = "aotd_tech_advanced_mining_equipment";
     public static final String ALLOY_PRODUCTION_MATRIX = "aotd_tech_alloy_production";
     public static final String ORBITAL_ASSEMBLY = "aotd_tech_orbital_assembly";
+    public static final String ORBITAL_CONFIGURATION_THEORY = "aotd_tech_orbital_configuration_theory";
     public static final String CONSUMER_GOODS_PRODUCTION = "aotd_tech_consumer";
     public static final String STREAMLINED_PRODUCTION = "aotd_tech_streamlined_production";
     public static final String MAGLEV = "aotd_tech_maglev";

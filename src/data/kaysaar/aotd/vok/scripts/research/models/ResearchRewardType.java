@@ -8,6 +8,7 @@ public enum ResearchRewardType {
     SPECIAL_ABILITY,
     MODIFIER,
     UNIDENTIFIED,
-    STABLESTRUCTURES
+    STABLESTRUCTURES,
+    RECIPE
 }
 

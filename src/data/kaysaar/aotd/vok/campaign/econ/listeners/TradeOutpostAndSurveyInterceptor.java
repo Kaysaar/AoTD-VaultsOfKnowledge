@@ -11,6 +11,7 @@ import com.fs.starfarer.api.ui.*;
 import data.kaysaar.aotd.tot.plugins.ProductionUtil;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.ui.ColonyDevelopmentDialog;
 import data.kaysaar.aotd.vok.campaign.econ.industry.TradePostIndustry;
+import data.kaysaar.aotd.vok.events.AbyssalColonizationProposal;
 import data.kaysaar.aotd.vok.plugins.ReflectionUtilis;
 import data.kaysaar.aotd.vok.scripts.coreui.listeners.CargoPanelContextUI;
 import data.kaysaar.aotd.vok.scripts.coreui.listeners.IndustryPanelContextUI;
@@ -64,8 +65,8 @@ public class TradeOutpostAndSurveyInterceptor implements MarketUIListener {
                     }
                 }
             }
-            if(ctx.market.getContainingLocation()!=null&&ctx.market.getContainingLocation().hasTag(Tags.SYSTEM_ABYSSAL)&&ctx.market.getStarSystem().getId().equals("limbo")){
-                ///TODO- LATER
+            if(ctx.market.getContainingLocation()!=null&&ctx.market.getContainingLocation().hasTag(Tags.SYSTEM_ABYSSAL)&&ctx.market.getStarSystem().getId().equals("limbo")&&Global.getSector().getMemoryWithoutUpdate().is(AbyssalColonizationProposal.memkeyForColnization,true)){
+
                Object plSurveyPanel = ReflectionUtilis.getChildrenCopy((UIPanelAPI) ReflectionUtilis.getChildrenCopy(ctx.surveyPanel).get(2)).get(0);
                if(plSurveyPanel instanceof TooltipMakerAPI tl){
                    if(tl.getPrev() instanceof LabelAPI label){

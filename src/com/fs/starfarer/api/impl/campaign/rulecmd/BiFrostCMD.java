@@ -47,6 +47,10 @@ public class BiFrostCMD extends BaseCommandPlugin {
         String command = params.get(0).getString(memoryMap);
         if (command == null) return false;
 
+        if (command.equals("setGateImage")) {
+            entity.setInteractionImage("megastructureImage", params.get(1).getString(memoryMap));
+            dialog.getVisualPanel().showImageVisual(entity.getCustomInteractionDialogImageVisual());
+        }
         if (command.equals("selectDestination")) {
             selectDestination();
         }

@@ -3,6 +3,7 @@ package data.kaysaar.aotd.vok.campaign.econ.industry;
 import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.util.Pair;
+import data.kaysaar.aotd.tot.recipes.AoTDIndustryRecipePlugin;
 import data.kaysaar.aotd.vok.Ids.AoTDCommodities;
 import data.kaysaar.aotd.vok.Ids.AoTDTechIds;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
@@ -14,22 +15,18 @@ public class EnrichmentFacility extends BaseIndustry {
         super.apply(true);
         int size = market.getSize() - 3;
 
+        demand(Commodities.HEAVY_MACHINERY, size + 2);
         demand(Commodities.ORE, 7 + size);
         demand(Commodities.RARE_ORE, 10 + size); // have to keep it low since it can be circular
-        demand(Commodities.HEAVY_MACHINERY, size + 2);
-        if (AoTDMainResearchManager.getInstance().isAvailableForThisMarket(AoTDTechIds.ALLOY_PURIFICATION, this.getMarket())) {
-            supply(AoTDCommodities.PURIFIED_TRANSPLUTONICS, market.getSize() + 1);
-            demand(AoTDCommodities.DOMAIN_GRADE_MACHINERY, market.getSize() - 3);
-        } else {
-            supply(AoTDCommodities.PURIFIED_TRANSPLUTONICS, market.getSize() - 2);
-        }
-
-        supply(Commodities.RARE_METALS, market.getSize() + 2);
         supply(Commodities.METALS, market.getSize() - 2);
+        supply(Commodities.RARE_METALS, market.getSize() + 2);
+        supply(AoTDCommodities.PURIFIED_TRANSPLUTONICS, market.getSize() - 2);
 
 
-        Pair<String, Integer> deficit = getMaxDeficit(Commodities.ORE, Commodities.RARE_ORE, Commodities.HEAVY_MACHINERY, AoTDCommodities.DOMAIN_GRADE_MACHINERY);
+
+        Pair<String, Integer> deficit = getMaxDeficit(Commodities.ORE, Commodities.RARE_ORE, Commodities.HEAVY_MACHINERY);
         applyDeficitToProduction(1, deficit, AoTDCommodities.PURIFIED_TRANSPLUTONICS, Commodities.RARE_METALS, Commodities.METALS);
+        AoTDIndustryRecipePlugin.applyRecipeFromIndustry(this);
         if (!isFunctional()) {
             supply.clear();
         }
@@ -38,6 +35,7 @@ public class EnrichmentFacility extends BaseIndustry {
 
     @Override
     public void unapply() {
+        AoTDIndustryRecipePlugin.unapplyRecipeFromIndustry(this);
         super.unapply();
     }
 

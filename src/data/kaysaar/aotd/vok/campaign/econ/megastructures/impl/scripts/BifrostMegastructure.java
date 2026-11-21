@@ -1,6 +1,5 @@
 package data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -22,7 +21,7 @@ public class BifrostMegastructure extends BaseMegastructureScript {
     public static final String ISOLATION_REMOVED = "$aotd_bifrost_removed_isolation";
 
     public void updateIsolation(StarSystemAPI system) {
-        if (system == null || !Global.getSettings().getModManager().isModEnabled("aotd_theory_of_toolbox")) return;
+        if (system == null) return;
         boolean connected = false;
         for (BifrostSection section : getSections()) {
             SectorEntityToken gate = section.getGateTiedTo();
@@ -114,23 +113,6 @@ public class BifrostMegastructure extends BaseMegastructureScript {
             }
         }
         return sections;
-    }
-    public void addNewBifrostGate(StarSystemAPI systemAPI) {
-        BifrostSection section = (BifrostSection) getSectionSpec().getScript();
-        section.init(this, false,getSectionSpec().getId());
-        section.setStarSystemAPI(systemAPI);
-        section.startRestoration();
-
-        this.megaStructureSections.add(section);
-    }
-    public void addNewBifrostGate(StarSystemAPI systemAPI, BifrostLocationData data) {
-        BifrostSection section = (BifrostSection) getSectionSpec().getScript();
-        section.init(this, false,getSectionSpec().getId());
-        section.setStarSystemAPI(systemAPI);
-        section.startRestoration();
-        section.setData(data);
-
-        this.megaStructureSections.add(section);
     }
     @Override
     public void advance(float amount) {

@@ -21,17 +21,12 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import data.kaysaar.aotd.vok.Ids.AoTDConditions;
 import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
-import data.kaysaar.aotd.vok.campaign.econ.SMSpecialItem;
 
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.models.BaseMegastructureScript;
 import data.kaysaar.aotd.vok.misc.AoTDMisc;
 import data.kaysaar.aotd.vok.scripts.research.AoTDFactionResearchManager;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.*;
 
 import static data.kaysaar.aotd.vok.Ids.AoTDMemFlags.preCollapseFacList;
@@ -69,23 +64,6 @@ public class AoTDDataInserter {
             }
         }
         Global.getSector().getPersistentData().put(preCollapseFacList, planetsWithFac);
-    }
-
-    public void insertSpecItemsForMacroIndustrialComplexData() throws JSONException, IOException {
-        JSONArray json = Global.getSettings().getMergedSpreadsheetDataForMod("id", "data/campaign/macro_industrial_complex.csv", "aod_core");
-        ArrayList<SMSpecialItem> insertedSpecItemForMacroIndustrialComplex = new ArrayList<SMSpecialItem>();
-        for (int i = 0; i < json.length(); i++) {
-            JSONObject obj = json.getJSONObject(i);
-            String id = obj.getString("id");
-            if (id == null || id.isEmpty()) continue;
-
-            String itemCostRaw = obj.getString("resources_to_make_one");
-            float dayCost = Float.parseFloat(obj.getString("time_to_make_one"));
-            HashMap<String, Integer> itemCost = getItemCost(itemCostRaw);
-            insertedSpecItemForMacroIndustrialComplex.add(new SMSpecialItem(itemCost, id, dayCost));
-
-        }
-        Global.getSector().getPersistentData().put("$aotd_macro_industrial_complex_items", insertedSpecItemForMacroIndustrialComplex);
     }
 
     public void insertSophia() {
@@ -311,20 +289,6 @@ public class AoTDDataInserter {
 //        token.getMemoryWithoutUpdate().set(MusicPlayerPluginImpl.MUSIC_SET_MEM_KEY, "aotd_mega");
 //        MiscellaneousThemeGenerator.makeDiscoverable(token, 40000, 3000f);
 
-    }
-
-    public HashMap<String, Integer> getItemCost(String reqItems) {
-        String[] splitedAll = reqItems.split(",");
-        HashMap<String, Integer> itemsReq = new HashMap<>();
-        for (String s : splitedAll) {
-            String[] splitedInstance = s.split(":");
-            if (Integer.parseInt(splitedInstance[1]) > 0) {
-                itemsReq.put(splitedInstance[0], Integer.parseInt(splitedInstance[1]));
-            }
-
-        }
-
-        return itemsReq;
     }
 
     public void RandomSetIndustryOnPlanet(String industryId, int amount, String PlanetType) {

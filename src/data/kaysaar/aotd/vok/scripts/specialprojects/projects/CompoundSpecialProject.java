@@ -28,6 +28,8 @@ public class CompoundSpecialProject extends AoTDSpecialProject {
     public void createRewardSection(TooltipMakerAPI tooltip, float width) {
         tooltip.addPara("Gain access to produce new commodity : Compound, that can enhance efficiency of fuel.", Misc.getPositiveHighlightColor(),5f);
         tooltip.addPara("Each Fuel Refinery will have a supply of compound equal to half of the market size.", Misc.getPositiveHighlightColor(),5f);
+        tooltip.addPara("Unlocks %s production recipes: %s for the Megaport and %s for the Daedalus Array. With full Compound supply, both halve Fuel demand.",
+                5f, Misc.getHighlightColor(), "2", "Compound-Assisted Refuelling", "Compound-Assisted Orbital Refuelling");
         if(!wasCompleted){
             tooltip.addPara("This project can only be started if our faction has at least one %s under control.",5f, Color.ORANGE,"Fuel Refinery");
         }

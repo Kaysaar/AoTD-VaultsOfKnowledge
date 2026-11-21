@@ -30,7 +30,6 @@ public class AoTDCrystalCasinoContacts extends BaseCommandPlugin {
     @Override
     public boolean execute(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params,
                            Map<String, MemoryAPI> memoryMap) {
-        if (!Global.getSettings().getModManager().isModEnabled("aotd_theory_of_toolbox")) return false;
         if (dialog == null || params == null || params.isEmpty() || memoryMap == null) return false;
 
         MemoryAPI local = memoryMap.get(MemKeys.LOCAL);

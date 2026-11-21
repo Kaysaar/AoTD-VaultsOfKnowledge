@@ -11,7 +11,7 @@ public class DadelousArrayEvent extends FirstIndustryEvent {
 
     @Override
     public TimelineEventType getEventType() {
-        return TimelineEventType.PROSPERITY;
+        return TimelineEventType.UNIQUE;
     }
 
     @Override

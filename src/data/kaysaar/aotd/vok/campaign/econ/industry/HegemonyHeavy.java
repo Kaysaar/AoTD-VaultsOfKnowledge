@@ -37,6 +37,7 @@ public class HegemonyHeavy extends AoTDHeavyIndustry {
                 }
             }
         }
+        demand(Commodities.RARE_METALS, size - 2);
         if(market.getId().equals("chicomoztoc")){
             demand(AoTDCommodities.REFINED_METAL, size-1);
         }
@@ -44,7 +45,6 @@ public class HegemonyHeavy extends AoTDHeavyIndustry {
             demand(AoTDCommodities.REFINED_METAL, size+2);
             demand(AoTDCommodities.ADVANCED_COMPONENTS, size-1);
         }
-        demand(Commodities.RARE_METALS, size - 2);
 
         supply(Commodities.HEAVY_MACHINERY, size + 4);
         supply(Commodities.SUPPLIES, size + 4);

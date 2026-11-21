@@ -11,7 +11,7 @@ public class TierFourStationHighTechEvent extends FirstIndustryEvent {
 
     @Override
     public TimelineEventType getEventType() {
-        return TimelineEventType.MILITARY;
+        return TimelineEventType.UNIQUE;
     }
 
     @Override

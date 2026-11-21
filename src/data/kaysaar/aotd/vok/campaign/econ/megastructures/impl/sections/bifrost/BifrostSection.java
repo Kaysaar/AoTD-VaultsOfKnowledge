@@ -236,11 +236,6 @@ public class BifrostSection extends BaseMegastructureSection {
     }
 
 
-    public void setData(BifrostLocationData data) {
-        this.data = data;
-    }
-
-
     @Override
     public void applyOnRestoration() {
         if(getData()==null){
@@ -259,9 +254,7 @@ public class BifrostSection extends BaseMegastructureSection {
             gateTiedTo = BifrostMegastructure.spawnGate(getData());
         }
 
-        if (Global.getSettings().getModManager().isModEnabled("aotd_theory_of_toolbox")) {
-            BifrostSystemStructure.attachExistingGate(gateTiedTo);
-        }
+        BifrostSystemStructure.attachExistingGate(gateTiedTo);
         ((BifrostMegastructure) getMegastructureTiedTo()).updateIsolation(starSystemAPI);
     }
 
