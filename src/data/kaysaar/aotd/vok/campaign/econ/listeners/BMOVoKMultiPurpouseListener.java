@@ -6,6 +6,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.MutableStat;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.AbyssalFrontier;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.BoreCity;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentCondition;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentManager;
@@ -45,10 +46,11 @@ public class BMOVoKMultiPurpouseListener implements BuildingMenuListener {
 
     @Override
     public void modifyIndustryConstructionPrice(Industry indInstance, MarketAPI market, boolean isForUpgrade, MutableStat price) {
-        if(ColonyDevelopmentManager.getColonyDevelopmentConditionIfPresent(market)!=null){
-            if(ColonyDevelopmentManager.getColonyDevelopmentConditionIfPresent(market).getIdOfDevelopment().equals("borecity")){
-                price.modifyMult("bore_city", BoreCity.COST_MULT,"Bore City");
-            }
+        String development = ColonyDevelopmentManager.getColonyDevPlanIfPresent(market);
+        if ("borecity".equals(development)) {
+            price.modifyMult("bore_city", BoreCity.COST_MULT, "Bore City");
+        } else if (AbyssalFrontier.ID.equals(development) && AoTDIndustries.BLACK_SITE.equals(indInstance.getId())) {
+            price.modifyMult(AbyssalFrontier.ID, 0.5f, "Abyssal Frontier");
         }
     }
 }

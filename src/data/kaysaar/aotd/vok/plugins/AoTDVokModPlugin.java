@@ -5,6 +5,7 @@ import ashlib.data.plugins.events.AshlibBaseEventManager;
 import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
+import data.kaysaar.aotd.vok.scripts.pcf.unique.MeetTheSpy;
 import data.kaysaar.aotd.vok.campaign.econ.stablestructures.CrystalCasinoGuestManager;
 import com.fs.starfarer.api.campaign.CustomCampaignEntityPlugin;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
@@ -64,6 +65,7 @@ import data.kaysaar.aotd.vok.scripts.CurrentResearchProgressUI;
 import data.kaysaar.aotd.vok.scripts.coreui.*;
 import data.kaysaar.aotd.vok.scripts.coreui.listeners.ColonyUIListener;
 import data.kaysaar.aotd.vok.scripts.coreui.listeners.MarketContextListenerInjector;
+import data.kaysaar.aotd.vok.scripts.misc.AoTDAshPadUIScript;
 import data.kaysaar.aotd.vok.scripts.misc.AoTDCompoundUIInMarketScript;
 import data.kaysaar.aotd.vok.scripts.misc.AoTDCompoundUIScript;
 import data.kaysaar.aotd.vok.scripts.misc.AoTDFuelConsumptionScript;
@@ -163,6 +165,7 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
             BMOTechReqListener listener = new BMOTechReqListener(industry.one,industry.two);
             AdditionalReqManager.getInstance().addReq(listener);
         }
+        AdditionalReqManager.getInstance().addReq(new BMOHexagonPlatformReq());
 
         Global.getSettings().loadFont("graphics/fonts/orbitron16.fnt");
 //        if (!LunaSettingsLoader.INSTANCE.getHasLoaded()) {
@@ -484,6 +487,8 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
         super.onNewGameAfterEconomyLoad();
 
         aoTDDataInserter.generatePreCollapseFacilities();
+        MeetTheSpy.assignFacility();
+        aoTDDataInserter.assignGenericFacilities();
         aoTDDataInserter.spawnVeilPlanet();
         aoTDDataInserter.spawnMegas();
         if (Global.getSettings().getModManager().isModEnabled("uaf")) {
@@ -513,6 +518,7 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
         ColonyDevelopmentManager.getInstance().addDevelopmentScriptBase("hypershunt",new HypershuntQuaters());
         ColonyDevelopmentManager.getInstance().addDevelopmentScriptBase("borecity",new BoreCity());
         ColonyDevelopmentManager.getInstance().addDevelopmentScriptBase("abyss_colony",new AbyssalFrontier());
+        ColonyDevelopmentManager.getInstance().addDevelopmentScriptBase(HexagonPlatform.ID,new HexagonPlatform());
 
         // Change required : breaks with modded buildings that aren't part of the tech trees, including the Megastructures
         DistributedRegionalNetwork.addNewIndustries(IndustrySynergiesMisc.getIdsOfTreeFromIndustry(AoTDIndustries.MONOCULTURE));
@@ -656,6 +662,10 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
 //        });
         Global.getSector().removeTransientScriptsOfClass(AoTDCompoundUIScript.class);
         Global.getSector().removeTransientScriptsOfClass(AoTDCompoundUIInMarketScript.class);
+        Global.getSector().removeTransientScriptsOfClass(AoTDAshPadUIScript.class);
+        if (Global.getSettings().getModManager().isModEnabled("aotd_ashpad")) {
+            Global.getSector().addTransientScript(new AoTDAshPadUIScript());
+        }
 
         Global.getSector().getListenerManager().addListener(new RnDTabListener(),true);
         Global.getSector().addTransientScript(new DelayedActionScript(0.1f) {

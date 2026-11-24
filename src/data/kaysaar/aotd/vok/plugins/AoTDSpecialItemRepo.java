@@ -17,6 +17,7 @@ import com.fs.starfarer.api.util.Misc;
 import data.kaysaar.aotd.vok.Ids.AoTDCommodities;
 import data.kaysaar.aotd.vok.Ids.AoTDItems;
 import data.kaysaar.aotd.vok.campaign.econ.industry.MiscHiddenIndustry;
+import data.kaysaar.aotd.vok.campaign.econ.items.AquaOrbEffect;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.List;
 
 public class AoTDSpecialItemRepo {
     public void putInfoForSpecialItems() {
+        ItemEffectsRepo.ITEM_EFFECTS.put(AoTDItems.AQUAORB, new AquaOrbEffect());
 
         ItemEffectsRepo.ITEM_EFFECTS.put(AoTDItems.HYPERDIMENSIONAL_PROCESSOR, new BoostIndustryInstallableItemEffect(
                 AoTDItems.HYPERDIMENSIONAL_PROCESSOR, 0, 0) {

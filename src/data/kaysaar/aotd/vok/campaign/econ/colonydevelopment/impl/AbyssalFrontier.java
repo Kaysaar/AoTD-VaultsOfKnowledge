@@ -1,11 +1,16 @@
 package data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.PlanetAPI;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.PlayerColonizationListener;
+import com.fs.starfarer.api.combat.StatBonus;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
+import com.fs.starfarer.api.plugins.SurveyPlugin;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.Fonts;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -14,10 +19,23 @@ import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.BaseColonyDe
 
 import java.awt.*;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static data.kaysaar.aotd.vok.misc.AoTDMisc.createTooltipOfResourcesForDialogConsumed;
 
 public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColonizationListener {
+    public static final String ID = "abyss_colony";
+    public static final int MONTHLY_UPKEEP = 250_000;
+    private static final int COLONY_SIZE = 4;
+    private static final String MODIFIER_ID = "aotd_abyssal";
+    private static final LinkedHashMap<String, Integer> COLONIZATION_COSTS = new LinkedHashMap<>();
+
+    static {
+        COLONIZATION_COSTS.put(Commodities.CREW, 10000);
+        COLONIZATION_COSTS.put(Commodities.HEAVY_MACHINERY, 1000);
+        COLONIZATION_COSTS.put(Commodities.SUPPLIES, 2000);
+    }
+
     @Override
     public String getName() {
         return "Abyssal Frontier";
@@ -39,7 +57,22 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
     }
 
     @Override
+    public boolean doesMeetAdditionalCriteriaForDevelopment(MarketAPI market) {
+        if (!(market.getPrimaryEntity() instanceof PlanetAPI planet)) return false;
+        CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
+        CargoAPI cargo = fleet.getCargo();
+        SurveyPlugin survey = (SurveyPlugin) Global.getSettings().getNewPluginInstance("surveyPlugin");
+        survey.init(fleet, planet);
+        Map<String, Integer> totalCosts = new LinkedHashMap<>(COLONIZATION_COSTS);
+        survey.getOutpostConsumed().forEach((id, amount) -> totalCosts.merge(id, amount, Integer::sum));
+        return totalCosts.entrySet().stream()
+                .allMatch(cost -> cargo.getCommodityQuantity(cost.getKey()) >= cost.getValue());
+    }
+
+    @Override
     public void executePlanBeforeColonization(MarketAPI market) {
+        CargoAPI cargo = Global.getSector().getPlayerFleet().getCargo();
+        COLONIZATION_COSTS.forEach(cargo::removeCommodity);
     }
 
     @Override
@@ -49,18 +82,24 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
 
     @Override
     public void apply(MarketAPI market) {
-        if(market.getSize()!=4){
-            int curr = market.getSize();
-            market.setSize(4);
-            market.removeCondition("population_"+curr);
-            market.addCondition(Conditions.POPULATION_4);
+        if (market.getSize() != COLONY_SIZE) {
+            int previousSize = market.getSize();
+            market.setSize(COLONY_SIZE);
+            market.removeCondition("population_" + previousSize);
         }
-        if(market.hasIndustry(Industries.POPULATION)){
-            market.getIndustry(Industries.POPULATION).getIncome().modifyMult("aotd_abyssal",0,"Abyssal Frontier");
+        if (!market.hasCondition(Conditions.POPULATION_4)) market.addCondition(Conditions.POPULATION_4);
+        Industry population = market.getIndustry(Industries.POPULATION);
+        if (population != null) {
+            population.getIncome().modifyMult(MODIFIER_ID, 0f, getName());
         }
 
-        market.getStats().getDynamic().getMod(
-                Stats.MAX_MARKET_SIZE).modifyFlat("aotd_abyssal",-Misc.getMaxMarketSize(market)+2,getName());
+        StatBonus maxSize = market.getStats().getDynamic().getMod(Stats.MAX_MARKET_SIZE);
+        maxSize.unmodifyFlat(MODIFIER_ID);
+        float multiplier = maxSize.getMult();
+        if (multiplier > 0f) {
+            float currentCap = maxSize.computeEffective(Misc.MAX_COLONY_SIZE);
+            maxSize.modifyFlat(MODIFIER_ID, (COLONY_SIZE - currentCap) / multiplier, getName());
+        }
     }
 
     @Override
@@ -118,10 +157,6 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
                 "transport costs"
         );
         tooltip.addPara(
-                "New unique structures will be available,in order to make this colony self-sufficient",
-                Misc.getPositiveHighlightColor(),3f
-        );
-        tooltip.addPara(
                 "Colony starts as size %s colony and %s.",
                 3f,
                 new Color[]{Misc.getPositiveHighlightColor(),Misc.getNegativeHighlightColor()},
@@ -154,7 +189,7 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
                 3f,
                 Misc.getHighlightColor(),
                 "4",
-                "250,000"
+                Misc.getWithDGS(MONTHLY_UPKEEP)
         );
 
         tooltip.setBulletedListMode(null);
@@ -208,11 +243,7 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
         );
         if (!forMarketCondition) {
             tooltip.addSectionHeading("Additional Cost For Colonization (Available)", Alignment.MID,5f);
-            LinkedHashMap<String,Integer> costs = new LinkedHashMap<>();
-            costs.put(Commodities.CREW, 10000);
-            costs.put(Commodities.HEAVY_MACHINERY, 1000);
-            costs.put(Commodities.SUPPLIES, 2000);
-            tooltip.addCustom(createTooltipOfResourcesForDialogConsumed(tooltip.getWidthSoFar()-10,45,45,costs,false),5f);
+            tooltip.addCustom(createTooltipOfResourcesForDialogConsumed(tooltip.getWidthSoFar()-10,45,45,COLONIZATION_COSTS,false),5f);
         }
     }
 
@@ -227,7 +258,9 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
     }
     @Override
     public void unapply(MarketAPI market) {
-
+        market.getStats().getDynamic().getMod(Stats.MAX_MARKET_SIZE).unmodifyFlat(MODIFIER_ID);
+        Industry population = market.getIndustry(Industries.POPULATION);
+        if (population != null) population.getIncome().unmodifyMult(MODIFIER_ID);
     }
 
     @Override

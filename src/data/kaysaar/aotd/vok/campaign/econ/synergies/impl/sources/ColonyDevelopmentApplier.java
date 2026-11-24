@@ -2,6 +2,7 @@ package data.kaysaar.aotd.vok.campaign.econ.synergies.impl.sources;
 
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.HexagonPlatform;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.BaseColonyDevelopment;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentCondition;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentManager;
@@ -15,6 +16,7 @@ public class ColonyDevelopmentApplier extends BaseIndustrySynergySource{
     static {
         values.put("core",0.15f);
         values.put("distributed",-0.10f);
+        values.put(HexagonPlatform.ID,0.20f);
     }
     public ColonyDevelopmentApplier(float baseEfficiency, String id) {
         super(baseEfficiency, id);

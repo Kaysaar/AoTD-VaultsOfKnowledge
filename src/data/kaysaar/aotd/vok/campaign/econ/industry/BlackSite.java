@@ -6,13 +6,23 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.AbyssalFrontier;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentManager;
 import data.kaysaar.aotd.vok.scripts.specialprojects.BlackSiteProjectManager;
 
 public class BlackSite extends ResearchFacility{
 
+    private boolean isAbyssalFrontier() {
+        return market != null && AbyssalFrontier.ID.equals(ColonyDevelopmentManager.getColonyDevPlanIfPresent(market));
+    }
+
     @Override
     public void apply() {
         super.apply();
+        if (isAbyssalFrontier()) {
+            getUpkeep().unmodifyFlat("aotd_research_3");
+            return;
+        }
         int stab = market.getStability().getModifiedInt();
         float reductionMult = 1;
         if(getAICoreId()!=null) {
@@ -50,7 +60,12 @@ public class BlackSite extends ResearchFacility{
     protected void addRightAfterDescriptionSection(TooltipMakerAPI tooltip, IndustryTooltipMode mode) {
         super.addRightAfterDescriptionSection(tooltip, mode);
         tooltip.addSectionHeading("Black Site costs",Misc.getTextColor(), Global.getSector().getFaction(Factions.PIRATES).getDarkUIColor(),Alignment.MID,10f);
-        tooltip.addPara("Due to this facility being black site, it requires additional funds for covering up operations, based on stability of colony",3f);
+        if (isAbyssalFrontier()) {
+            tooltip.addPara("Abyssal Frontier reduces construction cost by %s and waives cover-up costs.", 3f,
+                    Misc.getPositiveHighlightColor(), "50%");
+        } else {
+            tooltip.addPara("Due to this facility being black site, it requires additional funds for covering up operations, based on stability of colony",3f);
+        }
         tooltip.addPara("Each additional black site (up to 4) provides 5% special project speed bonus",Misc.getTooltipTitleAndLightHighlightColor(),3f );
 
 

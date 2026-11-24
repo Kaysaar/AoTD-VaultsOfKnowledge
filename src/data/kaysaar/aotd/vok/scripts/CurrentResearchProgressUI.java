@@ -24,9 +24,6 @@ import sidebarLib.UI.sidebarMain;
 import java.awt.*;
 import java.util.List;
 
-;
-
-
 public class CurrentResearchProgressUI implements CampaignUIRenderingListener, EveryFrameScript, CampaignInputListener {
     transient SpriteAPI sprite = Global.getSettings().getSprite("ui_campaign_components", "tech_panel");
     transient SpriteAPI spriteOfCurrentlyResearched;
@@ -227,7 +224,6 @@ public class CurrentResearchProgressUI implements CampaignUIRenderingListener, E
 
     @Override
     public void processCampaignInputPreCore(List<InputEventAPI> events) {
-
     }
 
     @Override

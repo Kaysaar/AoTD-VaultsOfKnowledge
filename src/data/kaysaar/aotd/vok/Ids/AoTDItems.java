@@ -2,6 +2,7 @@ package data.kaysaar.aotd.vok.Ids;
 
 public class AoTDItems {
 
+    public static final String AQUAORB = "aotd_aquaorb";
     public static final String HYPERDIMENSIONAL_PROCESSOR = "omega_processor";
     public static final String TURING_ENGINE = "turing_engine";
 

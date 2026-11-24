@@ -57,14 +57,6 @@ public class TradeOutpostAndSurveyInterceptor implements MarketUIListener {
     @Override
     public void onSurveyPanelCreated(SurveyPanelContextUI ctx) {
         if(ctx.market!=null){
-            if(ctx.market.hasCondition("pre_collapse_facility")&&!ctx.market.getPrimaryEntity().getMemory().is("$aotd_defeated_pcf",true)){
-                ButtonAPI colonize = ReflectionUtilis.findButtonWithText(ctx.surveyPanel,"Establish colony...",true,true);
-                if(colonize!=null){
-                    if(colonize.isEnabled()){
-                        colonize.setEnabled(false);
-                    }
-                }
-            }
             if(ctx.market.getContainingLocation()!=null&&ctx.market.getContainingLocation().hasTag(Tags.SYSTEM_ABYSSAL)&&ctx.market.getStarSystem().getId().equals("limbo")&&Global.getSector().getMemoryWithoutUpdate().is(AbyssalColonizationProposal.memkeyForColnization,true)){
 
                Object plSurveyPanel = ReflectionUtilis.getChildrenCopy((UIPanelAPI) ReflectionUtilis.getChildrenCopy(ctx.surveyPanel).get(2)).get(0);
@@ -89,6 +81,23 @@ public class TradeOutpostAndSurveyInterceptor implements MarketUIListener {
                        }
                    }
                }
+            }
+            if (ctx.market.hasCondition("pre_collapse_facility") && ctx.market.isPlanetConditionMarketOnly()
+                    && !ctx.market.getMemoryWithoutUpdate().getBoolean("$aotd_fac_explored")
+                    && !ctx.market.getMemoryWithoutUpdate().getBoolean("$aotd_failed_pre_collapse")) {
+                ButtonAPI colonize = ReflectionUtilis.findButtonWithText(ctx.surveyPanel, "Establish colony...", true, true);
+                if (colonize != null) {
+                    if (colonize.isEnabled()) colonize.setEnabled(false);
+                    String reason = "The Pre-Collapse Facility on this planet must be explored before a colonization effort can proceed.";
+                    List<UIComponentAPI> children = ReflectionUtilis.getChildrenCopy(ctx.surveyPanel);
+                    if (children.size() > 2 && children.get(2) instanceof UIPanelAPI container) {
+                        List<UIComponentAPI> contents = ReflectionUtilis.getChildrenCopy(container);
+                        if (!contents.isEmpty() && contents.get(0) instanceof TooltipMakerAPI info
+                                && !(info.getPrev() instanceof LabelAPI label && reason.equals(label.getText()))) {
+                            info.addPara(reason, 10f);
+                        }
+                    }
+                }
             }
         }
         UIComponentAPI comp;

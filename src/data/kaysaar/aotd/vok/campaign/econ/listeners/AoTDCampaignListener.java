@@ -1,10 +1,15 @@
 package data.kaysaar.aotd.vok.campaign.econ.listeners;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.MonthlyReport;
 import com.fs.starfarer.api.characters.AbilityPlugin;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.combat.EngagementResultAPI;
+import com.fs.starfarer.api.impl.campaign.shared.SharedData;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.AbyssalFrontier;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.models.ColonyDevelopmentManager;
 import data.kaysaar.aotd.vok.campaign.econ.industry.TradePostIndustry;
 import data.kaysaar.aotd.vok.campaign.econ.produciton.ProductionMonthlyHistoryManager;
 
@@ -111,7 +116,14 @@ public class AoTDCampaignListener implements CampaignEventListener {
 
     @Override
     public void reportEconomyTick(int iterIndex) {
-
+        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
+            if (!market.isPlayerOwned() || !AbyssalFrontier.ID.equals(ColonyDevelopmentManager.getColonyDevPlanIfPresent(market))) continue;
+            MonthlyReport report = SharedData.getData().getCurrentReport();
+            MonthlyReport.FDNode upkeep = report.getNode(report.getMarketNode(market), AbyssalFrontier.ID);
+            upkeep.name = "Abyssal Frontier upkeep";
+            upkeep.icon = Global.getSettings().getSpriteName("income_report", "generic_expense");
+            upkeep.upkeep += AbyssalFrontier.MONTHLY_UPKEEP / Global.getSettings().getFloat("economyIterPerMonth");
+        }
     }
 
     @Override

@@ -45,12 +45,16 @@ public class ColonyDevelopmentDialog extends BasePopUpDialog {
 
     @Override
     public void applyConfirmScript() {
+        if (returnValue == 0 || content == null || content.list == null || content.list.chosen == null) return;
+        String id = (String) content.list.chosen.getCustomData();
+        BaseColonyDevelopment development = ColonyDevelopmentManager.getInstance().getColonyDevelopment(id);
+        if (!development.doesMeetAdditionalCriteriaForDevelopment(market)) return;
+
         TextFieldAPI field = (TextFieldAPI) ReflectionUtilis.findFieldOfClass(panelRemoved, TextFieldAPI.class);
         field.setText(listComponent.field.getText());
         market.addCondition(BaseColonyDevelopment.condIdApplier);
         ColonyDevelopmentCondition cond = (ColonyDevelopmentCondition) market.getCondition(BaseColonyDevelopment.condIdApplier).getPlugin();
-        cond.setIdOfDevelopment((String) content.list.chosen.getCustomData());
-        BaseColonyDevelopment development = ColonyDevelopmentManager.getInstance().getColonyDevelopment((String) content.list.chosen.getCustomData());
+        cond.setIdOfDevelopment(id);
         development.executePlanBeforeColonization(market);
         returnValue = 0;
     }
@@ -61,10 +65,8 @@ public class ColonyDevelopmentDialog extends BasePopUpDialog {
         if(content!=null&&content.list!=null){
             if(content.list.chosen!=null){
                 BaseColonyDevelopment development = ColonyDevelopmentManager.getInstance().getColonyDevelopment((String) content.list.chosen.getCustomData());
-                if(development.doesMeetAdditionalCriteriaForDevelopment(market)!=confirmButton.isEnabled()){
-                    confirmButton.setEnabled(development.doesMeetAdditionalCriteriaForDevelopment(market));
-
-                }
+                boolean enabled = development.doesMeetAdditionalCriteriaForDevelopment(market);
+                if (confirmButton.isEnabled() != enabled) confirmButton.setEnabled(enabled);
             }
             else if (confirmButton.isEnabled()){
                 confirmButton.setEnabled(false);

@@ -1,4 +1,5 @@
 {
+	"bonusXP":{"aotdSpyMash":0},
 	
 	"aotd_tier_1_unlock":false, # Unlock vanilla tier of buildings by default
 	"aotd_tier_2_unlock":false, # Unlock tier 2 of industries ( such as the plasma harvester , orbital assembly etc etc) and all bellow this tier.
@@ -167,6 +168,8 @@
 			"aotd_hyperspace_scanner_sub":"graphics/icons/tech/aotd_hyperspace_scanner_sub.png"
 		},
 		"ui_campaign_components":{
+			"ashpad_holo_compact":"graphics/ui/campaign_infowidget_compact2-holo.png",
+			"ashpad_holo_full":"graphics/ui/campaign_infowidget4-holo.png",
 			"tech_panel":"graphics/ui/tech_progression_campaign.png",
 			"tech_button_hide":"graphics/ui/tech_hide_button.png",
 			"tech_hide_button_highlighted":"graphics/ui/tech_hide_button_highlighted.png",

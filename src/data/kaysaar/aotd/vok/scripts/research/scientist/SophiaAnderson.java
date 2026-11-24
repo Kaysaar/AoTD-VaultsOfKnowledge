@@ -52,14 +52,6 @@ public class SophiaAnderson extends ScientistPerson {
                         if(entry.getKey().equals("research_databank")){
                             entry.setValue(spec.getReqItemsToResearchFirst().get(entry.getKey())-1);
                         }
-                        else{
-
-                            entry.setValue(spec.getReqItemsToResearchFirst().get(entry.getKey())-100);
-                            if(entry.getValue()<=0){
-                                entry.setValue(0);
-                            }
-                        }
-
                     }
                 }
             }
@@ -77,13 +69,6 @@ public class SophiaAnderson extends ScientistPerson {
                     if(Global.getSettings().getSpecialItemSpec(entry.getKey())==null){
                         if(entry.getKey().equals("research_databank")){
                             entry.setValue(spec.getReqItemsToResearchFirst().get(entry.getKey()));
-                        }
-                        else{
-
-                            entry.setValue(spec.getReqItemsToResearchFirst().get(entry.getKey()));
-                            if(entry.getValue()<=0){
-                                entry.setValue(0);
-                            }
                         }
 
                     }

@@ -5,6 +5,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.util.Pair;
 import data.kaysaar.aotd.vok.Ids.AoTDCommodities;
 import data.kaysaar.aotd.vok.Ids.AoTDTechIds;
+import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.HexagonPlatform;
 import data.kaysaar.aotd.vok.plugins.AoDUtilis;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 
@@ -60,7 +61,8 @@ public class HighTechIndustry extends BaseIndustry {
 
     @Override
     public boolean isAvailableToBuild() {
-        return AoTDMainResearchManager.getInstance().isAvailableForThisMarket(AoTDTechIds.SOPHISTICATED_ELECTRONIC_SYSTEMS,market);
+        return !HexagonPlatform.blocksIndustry(market, getId())
+                && AoTDMainResearchManager.getInstance().isAvailableForThisMarket(AoTDTechIds.SOPHISTICATED_ELECTRONIC_SYSTEMS,market);
     }
 
     @Override
@@ -70,6 +72,7 @@ public class HighTechIndustry extends BaseIndustry {
 
     @Override
     public String getUnavailableReason() {
+        if (HexagonPlatform.blocksIndustry(market, getId())) return HexagonPlatform.BUILD_RESTRICTION;
         ArrayList<String> reasons = new ArrayList<>();
 
         if(!AoTDMainResearchManager.getInstance().isAvailableForThisMarket(AoTDTechIds.SOPHISTICATED_ELECTRONIC_SYSTEMS,market)){

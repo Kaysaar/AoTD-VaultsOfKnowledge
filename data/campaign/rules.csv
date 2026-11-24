@@ -71,30 +71,45 @@ FireAll AoTDMegaCheck",,1:defaultLeave:Leave,
 #END Pluto Mining Station,,,,,,
 ,,,,,,
 # Pre-Collapse Facility - Battle Variant,,,,,,
-pre_collapse_orbiting,OpenInteractionDialog,$aotd_r_expedition_present score:10000,"ShowDefaultVisual
+pre_collapse_orbiting,OpenInteractionDialog,"$aotd_r_expedition_present score:10000
+!$market.aotd_spy_site
+!$market.aotd_pcf_reactor
+!$market.aotd_pcf_mined_facility
+!$market.aotd_pcf_void_signal
+!$market.aotd_pcf_cybermaze","ShowDefaultVisual
 AoTDPCFEncounter init",,,
 pre_Collapse_bribery,OpenCommLink,$entity.fleetType == aotd_expedition score:100000,AoTDBeginConversation,,,
 pre_collapse_bribery_offer,DialogOptionSelected,$option == aotd_bribery_without_sp,AoTDBribery proposeBribery,,,
 pre_collapse_bribery_offer_succeed,DialogOptionSelected,$option == aotd_bribery_suceed,AoTDPCFEncounter bribery,,,
-preCollapse_continueAfterDefeatingExpedition,BeatDefendersContinue,,SetShortcut defaultLeave ESCAPE,,0:salBeatDefendersContinue:Continue,
-preCollapse_beatExpedition,BeginSalvage,"$market.isSurveyed
-$market.isPlanetConditionMarketOnly
-$market.mc:pre_collapse_facility
-!$market.aotd_fac_explored
-!$tag:gas_giant
-!$market.aotd_failed_pre_collapse",SetShortcut defaultLeave ESCAPE,,"0:explore_PreFac:Send a salvage team  to the facility
-100:defaultLeave:Leave",
-explore_PreFacility,DialogOptionSelected,$option == explore_PreFac,,,0:pre_salvage:Pick through the salvage,
-preSalvage,DialogOptionSelected,$option == pre_salvage,"PreCollapseFacLoot genLoot 
+explore_PreFacility,DialogOptionSelected,"$option == explore_PreFac
+!$market.aotd_pcf_reactor
+!$market.aotd_pcf_mined_facility
+!$market.aotd_pcf_void_signal
+!$market.aotd_pcf_cybermaze",,,0:pre_salvage:Pick through the salvage,
+preSalvage,DialogOptionSelected,"$option == pre_salvage
+!$market.aotd_pcf_reactor
+!$market.aotd_pcf_mined_facility
+!$market.aotd_pcf_void_signal
+!$market.aotd_pcf_cybermaze","PreCollapseFacLoot genLoot 
 $market.aotd_fac_explored = true",,,
 ,,,,,,
 ,,,,,,
 preCollapse_fac,PopulateOptions,"$market.isSurveyed
+!$market.aotd_pcf_cybermaze
+!$market.aotd_spy_site
+!$market.aotd_pcf_reactor
+!$market.aotd_pcf_mined_facility
+!$market.aotd_pcf_void_signal
 $market.isPlanetConditionMarketOnly
 $market.mc:pre_collapse_facility score:100000
 !$market.aotd_fac_explored
 !$tag:gas_giant
-!$market.aotd_failed_pre_collapse","ShowDefaultVisual
+!$market.aotd_failed_pre_collapse",,,5:aotdExplorePCF:Explore the Pre-Collapse Facility,
+aotdExplorePCFSelected,DialogOptionSelected,"$option == aotdExplorePCF
+!$market.aotd_pcf_reactor
+!$market.aotd_pcf_mined_facility
+!$market.aotd_pcf_void_signal
+!$market.aotd_pcf_cybermaze","ShowDefaultVisual
 AoTDPCFEncounter init",,,
 ,,,,,,
 ,,,,,,
@@ -120,6 +135,222 @@ $market.aotd_failed_pre_collapse","AoTDPCFFailed removeCondition
 SetShortcut defaultLeave ESCAPE",Unfortunately previous fleet have cleared entire planet from all of valuable data. There is nothing left valuable for us ,0:aotd_leave:Leave,
 preCollapse_fac_failed2,DialogOptionSelected,$option == aotd_leave,AoTDPCFFailed dismiss,,,
 #END Pre-Collapse Facility - Battle Variant,,,,,,
+aotdTechHuntersOpening,AoTDTechHuntersOpening,"$market.aotd_pcf_tech_hunters
+!$aotd_defeated_pcf","ShowDefaultVisual
+SetShortcut defaultLeave ESCAPE","Your sensors officer calls for the fleet to hold just beyond the horizon. An Independent tech-hunting crew has already fought its way into the facility. Most of its people are on the surface, with only a pair of freighters and a tanker left in orbit.
+
+Your tactical officer lays out two options. The marines can seize the dig while your fleet disables the ships overhead, or you can offer to buy the claim and ask the crew to keep the find quiet.","0:aotdTechHuntersRaid:Prepare a surprise strike
+1:aotdTechHuntersContact:Open a channel and offer to buy the claim
+100:defaultLeave:Leave for now",
+aotdTechHuntersContact,DialogOptionSelected,$option == aotdTechHuntersContact,TechHunters contact,,,
+aotdTechHuntersBuy,DialogOptionSelected,$option == aotdTechHuntersBuy,TechHunters buy,,,
+aotdTechHuntersBack,DialogOptionSelected,$option == aotdTechHuntersBack,FireBest AoTDTechHuntersOpening,,,
+aotdTechHuntersRaid,DialogOptionSelected,"$option == aotdTechHuntersRaid
+$market.aotd_pcf_tech_hunters
+!$aotd_defeated_pcf","$raidDifficulty = 60 0
+$raidGoBackTrigger = AoTDTechHuntersOpening 0
+$raidContinueTrigger = AoTDTechHuntersRaidContinue 0
+$raidRestrictToTrigger = AoTDTechHuntersRaidWon 0
+AddRaidObjective genericIcon ""Secure the tech hunters' dig site"" LOW 3000 AoTDTechHuntersRaidWon true
+ShowImageVisual raid_prepare",Your XO briefs the marine commander while the fleet plots firing solutions on the ships in orbit. The operation goes by the name Black Sky.,"0:mktRaidNonMarket:Review the marine assault plan
+1:aotdTechHuntersBack:Return to the bridge",
+aotdTechHuntersRaidWon,AoTDTechHuntersRaidWon,"$market.aotd_pcf_tech_hunters
+!$aotd_defeated_pcf","$market.aotd_pcf_tech_hunters_raided = true
+$aotd_defeated_pcf = true
+ShowImageVisual raid_valuables_result","The marines secure the site while your fleet disables the three ships in orbit. Boarding crews find them empty and start transferring their stores.
+
+Your salvage officer arrives on the bridge in a pressure suit, helmet tucked under one arm. ""Permission to head down and see what our unlucky friends found, Captain?""",,
+aotdTechHuntersRaidContinue,AoTDTechHuntersRaidContinue,"$market.aotd_pcf_tech_hunters
+$aotd_defeated_pcf","ShowDefaultVisual
+AoTDPCFEncounter init",,,
+aotdDerelictOpening,AoTDDerelictOpening,,SetShortcut defaultLeave ESCAPE,"Your sensors officer asks for a second pass over the facility. The oldest exposed layers date back more than a hundred cycles before the Collapse. The starport looks abandoned, but something under its hangar roofs is still drawing power.
+
+""Domain survey drones,"" tactical says. ""They're running in standby. An active sweep will wake them. We can pull back before they launch and fight them in open space.""
+
+Your XO turns from the display. ""Your orders, Captain?""","0:aotdDerelictEngage:Wake the drones and fall back to open space
+100:defaultLeave:Retreat and return when ready",
+aotdDerelictEngage,DialogOptionSelected,"$option == aotdDerelictEngage
+$market.aotd_pcf_derelicts
+!$aotd_defeated_pcf",AoTDPCFEncounter derelictEngage,,,
+aotdDerelictRetry,AoTDDerelictRetry,,SetShortcut defaultLeave ESCAPE,The surviving Domain drones still guard the facility.,"0:aotdDerelictEngage:Engage the defense drones
+100:defaultLeave:Retreat and return when ready",
+aotdMinedLanding,PopulateOptions,"$market.aotd_pcf_mined_facility
+$market.isSurveyed
+$market.isPlanetConditionMarketOnly
+$market.mc:pre_collapse_facility score:100000
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse
+!$tag:gas_giant",,,5:aotdMinedExplore:Explore the Pre-Collapse Facility,
+aotdMinedExplorePage,DialogOptionSelected,"$option == aotdMinedExplore
+$market.aotd_pcf_mined_facility
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse","ShowDefaultVisual
+FireBest AoTDMinedEnter",,,
+aotdMinedReturn,AoTDMinedEnter,$market.aotd_pcf_mined_complete,FireBest AoTDMinedResult,,,
+aotdMinedScan,AoTDMinedEnter,!$market.aotd_pcf_mined_complete,SetShortcut defaultLeave ESCAPE,"As your fleet settles into stationary orbit over the facility and begins its scans, your sensor officer speaks up.
+
+""Getting sensor anomalies on active scan. Doing a localized scan on one.""","0:aotdMinedAnomalies:Ask what the anomalies are
+1:aotdMinedWait:Wait for the sensor officer to finish his scans
+100:defaultLeave:Leave for now",
+aotdMinedAnomalyReport,DialogOptionSelected,"$option == aotdMinedAnomalies
+$market.aotd_pcf_mined_facility",SetShortcut defaultLeave ESCAPE,"""Something like sensor ghosts."" He turns from you to the comms officer. ""Can you check the fleet database against these readings? Sending the data to your console.""
+
+The comms officer nods. Both officers go quiet as they work.
+
+""Can't confirm it,"" the comms officer says, ""but there's about a 70 percent match to sensor ghosts linked to smart minefields. I'll keep digging.""","0:aotdMinedWait:Wait for the sensor officer to finish his scans
+100:defaultLeave:Leave for now",
+aotdMinedWaitPage,DialogOptionSelected,"$option == aotdMinedWait
+$market.aotd_pcf_mined_facility",FireBest AoTDMinedBriefing,,,
+aotdMinedConfirmation,AoTDMinedBriefing,!$market.aotd_pcf_mined_complete,SetShortcut defaultLeave ESCAPE,"A few minutes later, the sensor officer leans back in his chair and rubs the bridge of his nose.
+
+""I can confirm it now. Some variant of Tri-Tachyon's smart AI minefield. A mix of active mines, decoys, and sensor mines. Could be worse, but this is Second AI War tech.""","0:aotdMinedExplain:Ask about the minefield
+1:aotdMinedPlay:Let's start defusing this. I want to see what's waiting down there.
+100:defaultLeave:Leave for now",
+aotdMinedExplanation,DialogOptionSelected,"$option == aotdMinedExplain
+$market.aotd_pcf_mined_facility",SetShortcut defaultLeave ESCAPE,"The comms officer speaks up this time.
+
+""The Treaty of Chicomoztoc banned these mines after the AI War. Tri-Tach used them during its attempted invasion of the Hegemony. The mines could only kill so many people, and the invasion failed. Since the war, these minefields have occasionally turned up in ruins. An unaffiliated salvager wrote a guide on how to tackle them. It's in the fleet database, so I can walk you through it.""","0:aotdMinedPlay:Let's start defusing this. I want to see what's waiting down there.
+100:defaultLeave:Leave for now",
+aotdMinedRun,DialogOptionSelected,"$option == aotdMinedPlay
+$market.aotd_pcf_mined_facility
+!$market.aotd_pcf_mined_complete
+!$market.aotd_fac_explored",AoTDMinedFacility play,,,
+aotdMinedSweepResult,AoTDMinedResult,$market.aotd_pcf_mined_complete,SetShortcut defaultLeave ESCAPE,The salvage team returns to the fleet and submits its recovery report.,"0:aotdMinedSalvage:Review the recovered salvage
+100:defaultLeave:Leave for now",
+aotdMinedClaim,DialogOptionSelected,"$option == aotdMinedSalvage
+$market.aotd_pcf_mined_facility
+$market.aotd_pcf_mined_complete
+!$market.aotd_fac_explored",PreCollapseFacLoot genLoot,,,
+aotdVoidSignalLanding,PopulateOptions,"$market.aotd_pcf_void_signal
+$market.isSurveyed
+$market.isPlanetConditionMarketOnly
+$market.mc:pre_collapse_facility score:100000
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse
+!$tag:gas_giant",,,5:aotdVoidSignalExplore:Explore the Pre-Collapse Facility,
+aotdVoidSignalExplorePage,DialogOptionSelected,"$option == aotdVoidSignalExplore
+$market.aotd_pcf_void_signal
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse","ShowDefaultVisual
+FireBest AoTDVoidSignalEnter",,,
+aotdVoidSignalAfterExpedition,DialogOptionSelected,"$option == explore_PreFac
+$market.aotd_pcf_void_signal
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse","ShowDefaultVisual
+FireBest AoTDVoidSignalEnter",,,
+aotdVoidSignalReturn,AoTDVoidSignalEnter,$market.aotd_pcf_void_signal_complete,FireBest AoTDVoidSignalResult,,,
+aotdVoidSignalScan,AoTDVoidSignalEnter,!$market.aotd_pcf_void_signal_complete,SetShortcut defaultLeave ESCAPE,"A ping comes through the comms system as your fleet closes on the facility. Your comms officer frowns at the incoming message.
+
+""Automated warning from the facility,"" he says, still reading the screen. ""The entire site is on lockdown. It says the system has lost contact with its central server.""","0:aotdVoidSignalServers:How can a research facility lose its own servers?
+100:defaultLeave:Leave for now",
+aotdVoidSignalServerReport,DialogOptionSelected,"$option == aotdVoidSignalServers
+$market.aotd_pcf_void_signal
+!$market.aotd_pcf_void_signal_complete",SetShortcut defaultLeave ESCAPE,"The comms officer checks another screen. ""There isn't a main server room in the central complex. The servers must be somewhere else in the region, probably heavily shielded. Some pre-Collapse facilities isolated their networks like that for experimental processors or advanced AI work. It kept the processors from frying the local networks or an AI from escaping into them.""
+
+He brings up the completed lidar scans. A row of giant parabolic dishes stands outside the facility. ""Those are the relay dishes. You have to crank them into position by hand. That gave the staff control over when data could pass between the servers and the rest of the facility. They're all badly misaligned. We'll need to aim them ourselves.""","0:aotdVoidSignalDefenses:Could reconnecting the facility activate its defenses?
+1:aotdVoidSignalLocate:How do we find the servers?
+100:defaultLeave:Leave for now",
+aotdVoidSignalDefenseReport,DialogOptionSelected,"$option == aotdVoidSignalDefenses
+$market.aotd_pcf_void_signal
+!$market.aotd_pcf_void_signal_complete",SetShortcut defaultLeave ESCAPE,"""Probably,"" the head engineer says. ""Sites like this usually ran on gamma-level security. We can send a prepared comms package to keep the defense network quiet long enough to bypass it.""
+
+He grimaces. ""A decentralized site means each defense system has to be dealt with separately. It'll keep my crew busy, but we can handle it.""","0:aotdVoidSignalLocate:How do we find the servers?
+100:defaultLeave:Leave for now",
+aotdVoidSignalLocatePage,DialogOptionSelected,"$option == aotdVoidSignalLocate
+$market.aotd_pcf_void_signal
+!$market.aotd_pcf_void_signal_complete",FireBest AoTDVoidSignalReady,,,
+aotdVoidSignalBriefing,AoTDVoidSignalReady,!$market.aotd_pcf_void_signal_complete,SetShortcut defaultLeave ESCAPE,"The head engineer grins. ""The relay works both ways. We'll sweep the terrain with the dishes and ping each location with our scanners. When we get a reply back from the servers, bring every dish to its strongest signal. Where the beams cross, we'll send the salvage team.""
+
+You authorize the operation. Each dish can be selected with the mouse and adjusted with the arrow keys.","0:aotdVoidSignalPlay:Align the relay dishes
+100:defaultLeave:Leave for now",
+aotdVoidSignalRun,DialogOptionSelected,"$option == aotdVoidSignalPlay
+$market.aotd_pcf_void_signal
+!$market.aotd_pcf_void_signal_complete
+!$market.aotd_fac_explored",AoTDVoidSignal play,,,
+aotdVoidSignalBunker,AoTDVoidSignalResult,$market.aotd_pcf_void_signal_complete,"ShowImageVisual salvor_ruins
+SetShortcut defaultLeave ESCAPE","The salvage team cranks the last dish into place. The comms officer checks the readings and narrows down the server's location to a cluster of low hills some distance from the facility.
+
+You watch the team uncover the metal shielding and the bunker ports that receive and transmit the relay signals. Security is surprisingly light, and the salvage team reaches the central data room without much trouble. Beyond the servers, they find rooms full of Domain-era technology, archived and preserved for long-term storage. You wonder how long it would have taken anyone to stumble across the place by accident.","0:aotdVoidSignalSalvage:Begin salvaging the facility's server banks
+100:defaultLeave:Leave for now",
+aotdVoidSignalClaim,DialogOptionSelected,"$option == aotdVoidSignalSalvage
+$market.aotd_pcf_void_signal
+$market.aotd_pcf_void_signal_complete
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse","PreCollapseFacLoot genLoot
+$market.aotd_fac_explored = true",,,
+aotdPCFScan,PopulateOptions,"$market.isSurveyed
+$market.isPlanetConditionMarketOnly
+$market.mc:pre_collapse_facility
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse
+!$tag:gas_giant",,"Scans of the planet reveal a still-standing structure with architecture reminiscent of pre-collapse Domain industrial sites. Shielding on the outer layers of the building prevents a deeper scan, and your chief engineer strongly recommends sending out a salvage team to investigate the area, as the facility may contain rare Domain technologies.",,
+aotdCybermazeLanding,PopulateOptions,"$market.aotd_pcf_cybermaze
+!$market.aotd_spy_site
+$market.isSurveyed
+$market.isPlanetConditionMarketOnly
+$market.mc:pre_collapse_facility
+!$market.aotd_fac_explored
+!$market.aotd_failed_pre_collapse
+!$tag:gas_giant",,,5:aotdCybermazeExplore:Explore the Pre-Collapse Facility,
+aotdCybermazeEnter,DialogOptionSelected,$option == aotdCybermazeExplore,"ShowImageVisual salvor_ruins
+AoTDFacilityCybermaze enter",,,
+aotdCybermazeAfterExpedition,DialogOptionSelected,"$option == explore_PreFac
+$market.aotd_pcf_cybermaze
+!$market.aotd_spy_site","ShowImageVisual salvor_ruins
+AoTDFacilityCybermaze enter",,,
+aotdCybermazeEntrance,AoTDCybermazeEntrance,,SetShortcut defaultLeave ESCAPE,"The small shuttle carries you, a small salvage crew, and a small squad of bodyguards to the site of the facility. As you approach the entrance, you take note of the surprisingly robust infrastructure. Many of the facility systems are still operational, and the walls thrum with energy. Outside signage marks the building as a Domain-era industrial hub of minor import, though most of the details have been weathered away by the passage of time.
+
+Your salvage team reports that the entrance is barred by a standard Domain authentication process. Each person's TriPad credentials must be configured manually to gain access. The engineering team has already prepared a datachit program for standard network systems, but you'll need to take additional steps to override the Domain security system. Failed attempts may activate failsafes and awaken the facility's defenses.
+
+Your bodyguard retinue holds the perimeter while the salvage team gets the equipment in place.","0:aotdCybermazeProceed:Proceed with facility credential override
+100:defaultLeave:Leave for now",
+aotdCybermazeProceed,DialogOptionSelected,$option == aotdCybermazeProceed,AoTDFacilityCybermaze proceed,,,
+aotdCybermazeOptions,AoTDCybermazeOptions,,SetShortcut defaultLeave ESCAPE,The head salvager connects your TriPad to the control panel.,"0:aotdCybermazePlay:Begin the credential override
+1:aotdCybermazeTutorial:Ask the head salvager for a walkthrough
+100:defaultLeave:Leave for now",
+aotdCybermazeTutorial,DialogOptionSelected,$option == aotdCybermazeTutorial,AoTDFacilityCybermaze tutorial,,,
+aotdCybermazeWalkthrough,AoTDCybermazeWalkthrough,,SetShortcut defaultLeave ESCAPE,"As you connect your TriPad to the primary control board, your head salvager guides you through the process. ""The goal is to deliver a data packet with the security overrides into the overseer node. Direct communications with that node are firewalled and monitored. We'll hop from node to node until we find a direct connection. The system sweeps the network at regular intervals, so keep the packet clear of those sweeps.""
+
+Use the arrow keys to move the packet. Open Security Options for additional tools to help with the hack.","0:aotdCybermazePlay:Thank your head salvager and proceed with the hack
+100:defaultLeave:Leave for now",
+aotdCybermazePlay,DialogOptionSelected,$option == aotdCybermazePlay,AoTDFacilityCybermaze play,,,
+aotdCybermazeFirstFailure,AoTDCybermazeFirstFailure,,SetShortcut defaultLeave ESCAPE,"The data on your TriPad suddenly cuts to black as the connection to the control panel is forcibly disconnected by the system. There are no overt signs of the facility reacting to your attempted intrusion, but you feel the humming in the walls grow slightly louder. Your bodyguards tense up automatically, while the salvage team looks around nervously.
+
+Suddenly, a ping comes from your head salvager's TriPad. He glances at it, then pales. ""That hack attempt woke something up within the core of the system! The ship scanners are detecting a rising energy signature that's leaking through the facility shielding!
+
+""It doesn't look like it's activated yet, only primed. Some of the facility's auxiliary buildings have lit up, and there's radiation activity within those buildings.""","0:aotdCybermazeAskSafety:""Is it safe to continue?""
+100:defaultLeave:Cut your losses for now",
+aotdCybermazeFirstFailureAdvice,DialogOptionSelected,"$option == aotdCybermazeAskSafety
+$market.aotd_pcf_cybermaze
+$market.aotd_pcf_cybermaze_failures == 1
+!$market.aotd_pcf_cybermaze_access",SetShortcut defaultLeave ESCAPE,"The head salvager considers for a moment, then nervously nods. ""I think we have enough leeway for one more attempt. Security should get the shuttles ready, though. We need evac immediately if things go FUBAR. I'll leave the decision to you, captain.""","0:aotdCybermazePlay:Attempt to hack into the facility again
+100:defaultLeave:Cut your losses for now",
+aotdCybermazeRetry,AoTDCybermazeRetry,,SetShortcut defaultLeave ESCAPE,"The facility remains active after the last breach attempt. The security credentials still need to be overridden, and the defense systems are primed. You have one attempt left.","0:aotdCybermazePlay:Attempt to hack into the facility again
+100:defaultLeave:Come back later",
+aotdCybermazeFinalFailure,AoTDCybermazeFinalFailure,!$market.aotd_pcf_cybermaze_battle_started,,"This time, the facility's alarms blare as the TriPad cuts to black. Your bodyguards pull you away from the control panel. As the shuttle lifts off, you see a hangar door open and a swarm of autonomous drones launch in pursuit.
+
+Your team outmaneuvers the drones and docks with the fleet. Back on the bridge, your sensors officer reports multiple contacts rising from the facility.",0:aotdCybermazeEngage:Engage the autonomous defense fleet,
+aotdCybermazeEngage,DialogOptionSelected,$option == aotdCybermazeEngage,AoTDFacilityCybermaze defend,,,
+aotdCybermazeSuccess,AoTDCybermazeSuccess,!$market.aotd_pcf_cybermaze_failures,SetShortcut defaultLeave ESCAPE,The terminal beeps in confirmation as your TriPad fills with diagnostics. The network accepts your credentials and the defense systems deactivate. The main doors grind open as your teams prepare to enter.,"0:aotdCybermazeSalvage:Begin salvaging operations of the Pre-Collapse Facility
+100:defaultLeave:Leave for now",
+aotdCybermazeSecondSuccess,AoTDCybermazeSuccess,$market.aotd_pcf_cybermaze_failures == 1,SetShortcut defaultLeave ESCAPE,"The terminal confirms your credentials. The thrumming in the walls settles, and the head salvager reports that the activity in the outbuildings has returned to normal. The security team closes its perimeter as the main doors open.","0:aotdCybermazeSalvage:Begin salvaging operations of the Pre-Collapse Facility
+100:defaultLeave:Leave for now",
+aotdCybermazeDefenseRetry,AoTDCybermazeFinalFailure,$market.aotd_pcf_cybermaze_battle_started,SetShortcut defaultLeave ESCAPE,The facility's autonomous defense fleet still blocks access. Your crews prepare to re-engage.,"0:aotdCybermazeEngage:Engage the autonomous defense fleet
+100:defaultLeave:Leave for now",
+aotdCybermazeDefeated,AoTDCybermazeSuccess,$market.aotd_pcf_cybermaze_failures >= 2,"ShowImageVisual salvor_ruins
+SetShortcut defaultLeave ESCAPE","As the post-combat reports come through, you ask your engineers if the Pre-Collapse Facility has any more ""surprises"" in store for you. The chief engineer reports back on the ship scans. ""As far as we can tell, that was the primary defense mechanism of the facility. Activity levels of the facility have severely dropped, and I reckon that we can go down into the facility without too much trouble now. The original facility defense mechanisms were probably built to be reused, so now that all their droneships are destroyed, we can just brute force the local security networks without further repercussions. Still best to bring a minor security detail though, just in case.""","0:aotdCybermazePrepare:Prepare operations to send a scavenging squad down into the facility
+100:defaultLeave:Leave for now",
+aotdCybermazePrepare,DialogOptionSelected,"$option == aotdCybermazePrepare
+$market.aotd_pcf_cybermaze
+$market.aotd_pcf_cybermaze_access
+$market.aotd_pcf_cybermaze_failures >= 2
+!$market.aotd_fac_explored",SetShortcut defaultLeave ESCAPE,Your scavenging squad and its security detail secure the entrance.,"0:aotdCybermazeSalvage:Begin salvaging operations of the Pre-Collapse Facility
+100:defaultLeave:Leave for now",
+aotdCybermazeLoot,DialogOptionSelected,"$option == aotdCybermazeSalvage
+$market.aotd_pcf_cybermaze
+$market.aotd_pcf_cybermaze_access
+!$market.aotd_fac_explored","PreCollapseFacLoot genLoot
+$market.aotd_fac_explored = true",,,
 ,,,,,,
 # Research Databank Sell,,,,,,
 databanks_turnInOption,PopulateOptions,"$isPerson
@@ -369,3 +600,120 @@ aotdCasinoDismissStart,DialogOptionSelected,$option == aotdCasinoDismissStart,Ao
 defaultBack:Let them stay",
 aotdCasinoDismissConfirm,DialogOptionSelected,$option == aotdCasinoDismissConfirm,AoTDCrystalCasinoContacts dismiss,,cutCommLink:Close the comm link,The Java command calculates the actual reputation delta and displays it through CoreReputationPlugin.
 # END CRYSTAL CASINO,,,,,,
+,,,,,,
+# Pre-Collapse Facility - Vault,,,,,,
+aotdSpyLanding,PopulateOptions,"$market.aotd_spy_site
+$market.isSurveyed
+$market.isPlanetConditionMarketOnly
+$market.mc:pre_collapse_facility
+!$market.aotd_fac_explored",,,5:aotdSpyEnter:Explore the Pre-Collapse Facility,
+aotdSpyEnterPage,DialogOptionSelected,$option == aotdSpyEnter,"ShowImageVisual salvor_ruins
+FireBest AoTDSpyEnter",,,
+aotdSpyStart,AoTDSpyEnter,!$market.aotd_spy_vault,,"As your lead salvager guides you down into the facility, you notice a stripe running along each wall. On one side of the corridor it's red. On the other it's blue.",0:aotdSpyWalls:Why are the walls painted red and blue?,
+aotdSpyWallsPage,DialogOptionSelected,$option == aotdSpyWalls,,"""Not sure, $playerSirOrMadam."" The salvager shrugs. ""Some of my crew are still digging through what we think is an admin wing, but somebody scrambled the database a long time ago.""
+
+You pass a military checkpoint. Beneath a broken window lies a man in a spacesuit, face up, a kinetic sniper rifle beside him. Several toxic grenades on his belt are a very particular shade of yellow. The suit has preserved him remarkably well. You can still make out the scar below his right eye.
+
+""Likely died fighting someone up in the watchtower,"" one of your guards says. ""Can't tell if the fall killed him or if he fell through already dead.""",0:aotdSpyRifle:Let's keep moving. Have someone secure the rifle and take it to the fleet armory.,
+aotdSpyRiflePage,DialogOptionSelected,$option == aotdSpyRifle,,"The salvager motions to one of his crew and leads you on. The next body wears the remnants of a long white medical coat. Its right arm is out of its socket and its rib cage has been shattered.
+
+""Another melee kill,"" a guard says. ""Feels like this place got infiltrated by somebody good. Somebody nobody suspected.""
+
+A few minutes later, your lights pick out a hardhat on the floor. Its owner lies sprawled beside it with a single bullet wound between his eyes.",0:aotdSpyShot:Impressive shot.,
+aotdSpyShotPage,DialogOptionSelected,$option == aotdSpyShot,,"""Poor bastard was just a systems engineer,"" the salvager says. ""Augmented and probably dangerous, sure, but he didn't see it coming. And that hardhat was most definitely not ballistics grade.""","0:aotdSpyContinue:We're almost there, right? Let's get going.",
+aotdSpyContinuePage,DialogOptionSelected,$option == aotdSpyContinue,,The salvager nods. At the end of the corridor a metal door lies on the floor in two pieces. Someone went to considerable trouble to get through it. It looks kind of sad now.,0:aotdSpyFind:So where's this find?,
+aotdSpyFindPage,DialogOptionSelected,$option == aotdSpyFind,,"""Right there, $playerSirOrMadam."" Beyond the broken door he points to a frankly comically large vault door. There are more bodies between you and it.",0:aotdSpyBodies:Maybe we'll find out how this story ends.,
+aotdSpyBodiesPage,DialogOptionSelected,$option == aotdSpyBodies,,"You take the lead. Three bodies lie around a control panel. Their weapons are still where they fell, under the same dust that covers everything else.
+
+The largest man is bigger than your guards in their heavy power armor, though all he wore was a light armored suit. Beside him lies a gun you know takes power assistance to lift. A mono-edge knife is buried where his spine meets his shoulder blades. He would have died instantly.",0:aotdSpyDesk:Continue,
+aotdSpyDeskPage,DialogOptionSelected,$option == aotdSpyDesk,,"The smallest of the three is missing his head. The wall behind him is spattered with dried blood and shrapnel. His wristwatch is burnt out. Beside him lies a shattered case of narcotic inhalers with a device you don't recognize nestled among them.
+
+The last man, head shaved, lies face down over a combat shotgun. There's a knife wound at the base of his neck. You look back at the wall. Whoever killed these two did it after they'd killed their colleague. Painfully, at that.
+
+You step past them to the vault keypad.",0:aotdSpyPanel:Examine the keypad,
+aotdSpyPanelPage,DialogOptionSelected,$option == aotdSpyPanel,"$market.aotd_spy_vault = true
+$market.aotd_spy_hits = 0
+FireBest AoTDSpyKeys",,,
+aotdSpyResume,AoTDSpyEnter,"$market.aotd_spy_vault
+$market.aotd_spy_hits < 4",FireBest AoTDSpyKeys,,,
+aotdSpyResumeForced,AoTDSpyEnter,"$market.aotd_spy_vault
+$market.aotd_spy_hits >= 4",FireBest AoTDSpyForced,,,
+aotdSpyKeyOptions,AoTDSpyKeys,,"SetStoryOption aotdSpyMash 1 aotdSpyMash ui_char_spent_story_point_combat ""Struck the facility vault keypad""
+AoTDSpyKeypad show",A bank of numbered keys sits beneath the vault display.,"0:aotdSpyMash:Mash the keypad with your armored fist
+1:aotdSpyOpen:Open gate
+100:defaultLeave:Leave",
+aotdSpyMashPage,DialogOptionSelected,$option == aotdSpyMash,AoTDSpyKeypad mash,,,
+aotdSpyCodeOpens,DialogOptionSelected,"$option == aotdSpyOpen
+$market.aotd_spy_code",ShowImageVisual salvor_ruins,"The keypad beeps. The four ones give way to UNLOCKED. As the vault door rolls aside, your lights fall on stacks of databanks and Domain equipment. On a wooden desk sits a blue briefcase with another keypad.
+
+Out of curiosity, you try the same code. The latches click open.
+
+""Whatcha find, boss?"" the lead salvager asks over your shoulder.
+
+You lift the lid.",0:aotdSpyEmpty:Empty.,
+aotdSpyEmptyPage,DialogOptionSelected,$option == aotdSpyEmpty,,"There's an impression in the lining where something once lay. Whatever was important enough to keep in this briefcase, behind this vault door, somebody got to it first.",0:aotdSpyReplicator:Continue,
+aotdSpyForceOpens,AoTDSpyForced,,AoTDSpyKeypad show,"The keypad's beeps distort and fizzle out. Somewhere inside the door a bolt draws back. You never do learn the code.
+
+Beyond the door lies a trove of databanks and Domain equipment. A blue briefcase sits on a wooden desk. Whoever was here last left it open. You walk over and look inside. Empty.",0:aotdSpyBets:Our mystery figure was after the contents. We didn't find their body. They must have gotten out.,
+aotdSpyBetsPage,DialogOptionSelected,$option == aotdSpyBets,ShowImageVisual salvor_ruins,"There's a general grumbling among your guards. Credit chips quietly change hands, leaving a few of them a little richer.
+
+The open briefcase once held something important. The mystery figure got ahold of it long before you arrived. What was in it that drove someone to commit such a massacre? You feel like you'll never know.",0:aotdSpyReplicator:Continue,
+aotdSpyReplicatorPage,DialogOptionSelected,$option == aotdSpyReplicator,,"A few minutes later, the salvager calls you over to a combat drone replicator. Someone seems to have tried to make it mobile. Half-assembled tracks hang from its sides, and the whole thing is slathered in blue paint.",0:aotdSpyTracks:What in the name of Ludd did they do to this thing?,
+aotdSpyTracksPage,DialogOptionSelected,$option == aotdSpyTracks,,"""Hell if I know,"" the man says, scratching his head. ""Notice the bots scattered around it?""
+
+You nudge one of the larger ones you can move yourself. It is very much a machine, but there is something familiar about the set of its shoulders.",0:aotdSpyHardhat:Doesn't it look like our giant friend over there?,
+aotdSpyHardhatPage,DialogOptionSelected,$option == aotdSpyHardhat,,"The man crouches down and lifts its head with some effort. ""Yeah, it does."" He points to another bot. Its yellow head looks remarkably like a hardhat. ""And that one looks like the poor bastard we found earlier.""
+
+You glance back at the machine. Beneath a patch of flaking blue paint, four stamped letters show through: MANN.
+
+""What the hell is MANN?""",0:aotdSpyLoot:Recover the loot,
+aotdSpyClaim,DialogOptionSelected,"$option == aotdSpyLoot
+$market.aotd_spy_site
+!$market.aotd_fac_explored","$market.aotd_fac_explored = true
+$aotd_defeated_pcf = true
+PreCollapseFacLoot genLoot",,,
+,,,,,,
+aotdReactorLanding,PopulateOptions,"$market.aotd_pcf_reactor
+$market.isSurveyed
+$market.isPlanetConditionMarketOnly
+$market.mc:pre_collapse_facility score:100000
+!$market.aotd_fac_explored",,,5:aotdReactorExplore:Explore the Pre-Collapse Facility,
+aotdReactorExplorePage,DialogOptionSelected,"$option == aotdReactorExplore
+$market.aotd_pcf_reactor
+!$market.aotd_fac_explored","ShowImageVisual salvor_ruins
+FireBest AoTDReactorEnter",,,
+aotdReactorReturn,AoTDReactorEnter,$market.aotd_pcf_reactor_complete,AoTDReactorPlatform result,,,
+aotdReactorScan,AoTDReactorEnter,!$market.aotd_pcf_reactor_complete,SetShortcut defaultLeave ESCAPE,"Scans of the world show an old Domain-era reactor platform half-submerged beneath the waves. A trail of slag pollutes the waters around it, leaking enough radiation for your ship's sensors to pick up.
+
+The platform's unusual design draws the interest of your head engineer. ""Before its failure and collapse, a platform like that would have supported planetary-scale logistics on a water world. If we learned more about its design, we could reverse-engineer it for use on other ocean worlds.""
+
+He recommends sending a salvage team to examine the platform, though he warns that radiation exposure may pose a risk.","0:aotdReactorBoard:Send a team down to investigate the sinking platform
+100:defaultLeave:Leave for now",
+aotdReactorBoardPage,DialogOptionSelected,"$option == aotdReactorBoard
+$market.aotd_pcf_reactor",FireBest AoTDReactorReady,,,
+aotdReactorBriefing,AoTDReactorReady,,SetShortcut defaultLeave ESCAPE,"As the shuttle descends onto the platform, the salvage team prepares for a high-radiation environment. The dilapidated structure has left most of its security systems defunct. Through a camera feed, you watch your team make their way to the control room.
+
+The chief salvager pings your TriPad. ""I think the scans show the problem. We're in the control room, and right below us is a submerged reactor. Looks like the facility used neutrino rods for power, and they're still active.""","0:aotdReactorExplain:Are the rods still radioactive?
+1:aotdReactorPlay:Start the rod operation
+100:defaultLeave:Leave for now",
+aotdReactorExplanation,DialogOptionSelected,"$option == aotdReactorExplain
+$market.aotd_pcf_reactor",SetShortcut defaultLeave ESCAPE,"""That they are,"" the head salvager replies. ""An impact probably tore through the platform and let saltwater into the reactor room. The sodium corroded the boron control rods, and the radiation fried most of the controls.""
+
+""We need to raise the neutrino rods and sheath them. The hydraulic clamps are damaged. If we pull the rods in the wrong order, some will drop back down and damage the facility. The water will start rising as soon as I start the control panel. If it reaches the data room, we'll lose the platform designs.""","0:aotdReactorPlay:Start the rod operation
+100:defaultLeave:Leave for now",
+aotdReactorRun,DialogOptionSelected,$option == aotdReactorPlay,AoTDReactorPlatform play,,,
+aotdReactorGood,AoTDReactorGood,,SetShortcut defaultLeave ESCAPE,"With a sigh of relief, you watch the last rod rise into its lead casing. The head salvager gives you an okay through the camera feed while the team pats each other on the back. ""Well done, captain. We're ready to begin salvage when you are.""","0:aotdReactorSalvage:Begin operations to salvage the sunken platform
+100:defaultLeave:Leave for now",
+aotdReactorOkay,AoTDReactorOkay,,SetShortcut defaultLeave ESCAPE,"You wince as the battered neutrino rod slides into its lead casing. The hydraulics shudder with a groan as saltwater seeps into the room.
+
+""Looks like the facility took a hit, but the damage seems manageable,"" the head salvager reports. ""We're ready to proceed with salvage when you are.""","0:aotdReactorSalvage:Begin operations to salvage the sunken platform
+100:defaultLeave:Leave for now",
+aotdReactorBad,AoTDReactorBad,,SetShortcut defaultLeave ESCAPE,"The machinery screeches. A clamp shudders as the salvage team scrambles to contain the damage, but water rushes into the auxiliary rooms. The team eventually sheathes the damaged rod by hand.
+
+The head salvager shakes his head. ""That went badly, captain. We'll see what can still be recovered in the remaining rooms.""","0:aotdReactorSalvage:Begin operations to salvage the sunken platform
+100:defaultLeave:Leave for now",
+aotdReactorClaim,DialogOptionSelected,"$option == aotdReactorSalvage
+$market.aotd_pcf_reactor
+$market.aotd_pcf_reactor_complete
+!$market.aotd_fac_explored","$market.aotd_fac_explored = true
+PreCollapseFacLoot genLoot",,,

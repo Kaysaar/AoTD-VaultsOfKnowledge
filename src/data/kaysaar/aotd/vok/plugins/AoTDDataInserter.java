@@ -1,11 +1,10 @@
 package data.kaysaar.aotd.vok.plugins;
 
-import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.campaign.econ.MarketConditionAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.FullName;
 import com.fs.starfarer.api.characters.ImportantPeopleAPI;
 import com.fs.starfarer.api.characters.PersonAPI;
@@ -13,17 +12,28 @@ import com.fs.starfarer.api.impl.MusicPlayerPluginImpl;
 import com.fs.starfarer.api.impl.campaign.econ.ResourceDepositsCondition;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.procgen.Constellation;
+import com.fs.starfarer.api.impl.campaign.procgen.PlanetConditionGenerator;
+import com.fs.starfarer.api.impl.campaign.procgen.PlanetGenDataSpec;
+import com.fs.starfarer.api.impl.campaign.procgen.StarAge;
+import com.fs.starfarer.api.impl.campaign.procgen.StarGenDataSpec;
 import com.fs.starfarer.api.impl.campaign.procgen.StarSystemGenerator;
+import com.fs.starfarer.api.impl.campaign.procgen.themes.BaseThemeGenerator;
 import com.fs.starfarer.api.impl.campaign.procgen.themes.MiscellaneousThemeGenerator;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AoTDFacilityCybermaze;
 import com.fs.starfarer.api.impl.campaign.rulecmd.AoTDMegastructureRules;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AoTDMinedFacility;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AoTDPCFEncounter;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AoTDReactorPlatform;
+import com.fs.starfarer.api.impl.campaign.rulecmd.AoTDVoidSignal;
+import com.fs.starfarer.api.impl.campaign.rulecmd.TechHunters;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.util.Misc;
-import com.fs.starfarer.api.util.WeightedRandomPicker;
 import data.kaysaar.aotd.vok.Ids.AoTDConditions;
 import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
 
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.models.BaseMegastructureScript;
 import data.kaysaar.aotd.vok.misc.AoTDMisc;
+import data.kaysaar.aotd.vok.scripts.pcf.unique.MeetTheSpy;
 import data.kaysaar.aotd.vok.scripts.research.AoTDFactionResearchManager;
 import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
 
@@ -37,11 +47,12 @@ public class AoTDDataInserter {
     public static String AOTD = "aotd_";
 
     public void generatePreCollapseFacilities() {
-        int preCollapseFacAmount = AoTDSettingsManager.getIntValue(AoTDSettingsManager.AOTD_PCF_AMOUNT);
+        int target = AoTDSettingsManager.getIntValue(AoTDSettingsManager.AOTD_PCF_AMOUNT);
         List<StarSystemAPI> starSystems = Global.getSector().getStarSystems();
         List<PlanetAPI> planetsWithFac = new ArrayList<>();
         Collections.shuffle(starSystems);
         for (StarSystemAPI starSystem : starSystems) {
+            if (planetsWithFac.size() >= target) break;
             if (starSystem.getTags().contains(Tags.THEME_RUINS_MAIN) || starSystem.getTags().contains(Tags.THEME_REMNANT) || starSystem.getTags().contains(Tags.THEME_DERELICT) || starSystem.getTags().contains("")) {
                 for (PlanetAPI planet : starSystem.getPlanets()) {
                     if (planet.isStar()) continue;
@@ -49,21 +60,100 @@ public class AoTDDataInserter {
                     if (planet.hasTag(Tags.NOT_RANDOM_MISSION_TARGET)) continue;
                     if (planet.hasTag(Tags.MISSION_ITEM)) continue;
                     if (planet.isGasGiant()) continue;
-                    String token = planet.getMarket().addCondition("pre_collapse_facility");
-                    MarketConditionAPI marketConditionAPI = planet.getMarket().getSpecificCondition(token);
-                    planet.getMemoryWithoutUpdate().set(MemFlags.SALVAGE_SPEC_ID_OVERRIDE, "aotd_pre_collapse_fac");
-                    planet.getMemoryWithoutUpdate().set("$hasDefenders", "aotd_pre_collapse_fac");
-                    planet.addTag(Tags.NOT_RANDOM_MISSION_TARGET);
-                    marketConditionAPI.setSurveyed(false);
+                    addPreCollapseFacility(planet);
                     planetsWithFac.add(planet);
-                    preCollapseFacAmount--;
                     break;
                 }
-                if (preCollapseFacAmount <= 0) break;
 
             }
         }
+        if (target > 0) reserveReactorFacility(planetsWithFac, starSystems, target);
         Global.getSector().getPersistentData().put(preCollapseFacList, planetsWithFac);
+    }
+
+    private void addPreCollapseFacility(PlanetAPI planet) {
+        MarketAPI market = planet.getMarket();
+        String token = market.addCondition("pre_collapse_facility");
+        market.getSpecificCondition(token).setSurveyed(false);
+        planet.addTag(Tags.NOT_RANDOM_MISSION_TARGET);
+    }
+
+    private void reserveReactorFacility(List<PlanetAPI> facilities, List<StarSystemAPI> systems, int target) {
+        PlanetAPI reactor = facilities.stream().filter(planet -> Planets.PLANET_WATER.equals(planet.getTypeId()))
+                .findFirst().orElse(null);
+        if (reactor == null) {
+            Set<StarSystemAPI> occupied = new HashSet<>();
+            for (PlanetAPI facility : facilities) occupied.add(facility.getStarSystem());
+            List<StarSystemAPI> preferred = systems.stream().filter(system -> !occupied.contains(system)).toList();
+            reactor = spawnFallbackPlanet(preferred, "Pelagos", Planets.PLANET_WATER);
+            if (reactor == null) return;
+
+            int replacement = facilities.size() >= target ? facilities.size() - 1 : -1;
+            for (int i = 0; i < facilities.size(); i++) {
+                if (facilities.get(i).getStarSystem() == reactor.getStarSystem()) {
+                    replacement = i;
+                    break;
+                }
+            }
+            if (replacement >= 0) {
+                PlanetAPI replaced = facilities.remove(replacement);
+                replaced.getMarket().removeCondition("pre_collapse_facility");
+                replaced.removeTag(Tags.NOT_RANDOM_MISSION_TARGET);
+            }
+            if (!reactor.hasCondition(Conditions.WATER_SURFACE)) reactor.getMarket().addCondition(Conditions.WATER_SURFACE);
+            addPreCollapseFacility(reactor);
+            facilities.add(reactor);
+        }
+        reactor.getMarket().getMemoryWithoutUpdate().set(AoTDReactorPlatform.SITE, true);
+        Global.getLogger(AoTDDataInserter.class).info("Unique PCF [Reactor]: " + reactor.getName() + " [" + reactor.getId()
+                + "] in " + reactor.getStarSystem().getName() + " [" + reactor.getStarSystem().getId() + "]");
+    }
+
+    public void assignGenericFacilities() {
+        MemoryAPI sector = Global.getSector().getMemoryWithoutUpdate();
+        String assigned = "$aotd_pcf_generic_encounters_assigned";
+        if (sector.getBoolean(assigned)) return;
+        if (!(Global.getSector().getPersistentData().get(preCollapseFacList) instanceof List<?> facilities)) return;
+
+        List<String> encounters = List.of(AoTDFacilityCybermaze.SITE, TechHunters.SITE,
+                AoTDPCFEncounter.DERELICT_SITE, AoTDMinedFacility.SITE, AoTDVoidSignal.SITE);
+        List<PlanetAPI> candidates = new ArrayList<>();
+        int totalFacilities = 0, assignedEncounters = 0;
+        for (Object candidate : facilities) {
+            if (!(candidate instanceof PlanetAPI planet) || planet.getStarSystem() == null || planet.getMarket() == null
+                    || !planet.getMarket().isPlanetConditionMarketOnly() || !planet.hasCondition("pre_collapse_facility")) continue;
+            totalFacilities++;
+            MemoryAPI market = planet.getMarket().getMemoryWithoutUpdate();
+            if (market.getBoolean(MeetTheSpy.SITE) || market.getBoolean(AoTDReactorPlatform.SITE)
+                    || encounters.stream().anyMatch(market::getBoolean)) {
+                assignedEncounters++;
+                continue;
+            }
+            MemoryAPI entity = planet.getMemoryWithoutUpdate();
+            if (market.getBoolean("$aotd_fac_explored") || market.getBoolean("$aotd_failed_pre_collapse")
+                    || entity.contains("$aotd_precollapse_fleet") || entity.getBoolean("$aotd_r_expedition_present")
+                    || entity.getBoolean("$aotd_defeated_pcf") || entity.contains("$defenderFleet")) continue;
+            candidates.add(planet);
+        }
+
+        int standardCount = Math.round(totalFacilities * 0.4f);
+        int genericCount = Math.min(candidates.size(), totalFacilities - standardCount - assignedEncounters);
+        Collections.shuffle(candidates, Misc.random);
+        for (int i = 0; i < genericCount; i++) {
+            PlanetAPI planet = candidates.get(i);
+            String encounter = encounters.get(Misc.random.nextInt(encounters.size()));
+            planet.getMarket().getMemoryWithoutUpdate().set(encounter, true);
+            String name = switch (encounter) {
+                case AoTDFacilityCybermaze.SITE -> "Cybermaze";
+                case AoTDVoidSignal.SITE -> "Signal Triangulation";
+                default -> null;
+            };
+            if (name != null) {
+                Global.getLogger(AoTDDataInserter.class).info("Generic PCF [" + name + "]: " + planet.getName() + " [" + planet.getId()
+                        + "] in " + planet.getStarSystem().getName() + " [" + planet.getStarSystem().getId() + "]");
+            }
+        }
+        sector.set(assigned, true);
     }
 
     public void insertSophia() {
@@ -181,9 +271,13 @@ public class AoTDDataInserter {
     }
 
     public boolean spawnNidavleir(List<StarSystemAPI> systems) {
-        SectorEntityToken planet = getEntityWithCriteria(systems);
+        PlanetAPI planet = getEntityWithCriteria(systems);
+        if (planet == null) {
+            planet = spawnFallbackPlanet(systems, "Nidavelir", Planets.BARREN);
+        }
         if (planet == null) return false;
         planet.addTag(Tags.NOT_RANDOM_MISSION_TARGET);
+        planet.getMemoryWithoutUpdate().set("$aotd_mega_already", true);
         String token = planet.getMarket().addCondition("aotd_nidavelir_complex");
         planet.getMarket().getSpecificCondition(token).setSurveyed(false);
         planet.getMarket().removeCondition(Conditions.RUINS_EXTENSIVE);
@@ -195,62 +289,87 @@ public class AoTDDataInserter {
         if (!planet.getMarket().hasCondition(Conditions.RUINS_VAST)) {
             planet.getMarket().addCondition(Conditions.RUINS_VAST);
         }
-        planet.getMemoryWithoutUpdate().set("$aotd_mega_already", true);
 //        Global.getSector().getPlayerMemoryWithoutUpdate().set("$aotd_mega_system_id_"+mega.getSpec().getMegastructureID(),planet.getStarSystem().getId());
         return true;
 
 
     }
 
-    private SectorEntityToken getEntityWithCriteria(List<StarSystemAPI> availableStarSystems, String... criteria) {
-        WeightedRandomPicker<StarSystemAPI> systemAPIWeightedRandomPicker = new WeightedRandomPicker<>(Misc.random);
-        availableStarSystems.forEach(x -> {
-                    if (x.getAllEntities().stream().filter(y -> AshMisc.isStringValid(y.getCustomEntityType())).anyMatch(y -> y.getCustomEntityType().equals(Entities.CORONAL_TAP)) || x.getPlanets().stream().anyMatch(y -> !BaseMegastructureScript.getAllMegasFromEntity(y).isEmpty())) {
-                        systemAPIWeightedRandomPicker.add(x, 1);
-                    } else {
-                        systemAPIWeightedRandomPicker.add(x, 1000000);
-                    }
-                }
-        );
-        while (!systemAPIWeightedRandomPicker.isEmpty()) {
-            StarSystemAPI starSystem = systemAPIWeightedRandomPicker.pickAndRemove();
-            if (!starSystem.getTags().contains(Tags.THEME_CORE) && !starSystem.getTags().contains(Tags.THEME_CORE_POPULATED) && !starSystem.getTags().contains(Tags.THEME_CORE_UNPOPULATED) && !starSystem.getTags().contains(Tags.THEME_HIDDEN)) {
-                for (PlanetAPI planet : starSystem.getPlanets()) {
-                    if (planet.isStar()) continue;
-                    if (planet.isMoon()) continue;
-                    if (!planet.getMarket().isPlanetConditionMarketOnly()) continue;
-                    if (planet.hasTag(Tags.NOT_RANDOM_MISSION_TARGET)) continue;
-                    if (planet.hasTag(Tags.MISSION_ITEM)) continue;
-                    if (planet.isStar()) continue;
-                    if (planet.isGasGiant()) continue;
-                    if (planet.getRadius() <= 40) continue;
-                    if (planet.getMemoryWithoutUpdate().is("$aotd_mega_already", true)) continue;
-                    if (planet.getMemory().contains("$IndEvo_ArtilleryStation")) continue;
-//                    if (planet.getMemory().contains(GPBaseMegastructure.memKey)) continue;
-                    if (criteria != null) {
-                        for (String criterion : criteria) {
-                            if (planet.getTypeId().equals(criterion)) return planet;
-
-                        }
-
-                    }
-                    return planet;
-                }
+    private PlanetAPI getEntityWithCriteria(List<StarSystemAPI> availableSystems, String... criteria) {
+        List<String> types = Arrays.asList(criteria);
+        for (StarSystemAPI system : getMegastructureSystems(availableSystems)) {
+            for (PlanetAPI planet : system.getPlanets()) {
+                if (planet.isStar() || planet.isMoon() || planet.isGasGiant() || planet.getRadius() <= 40f) continue;
+                if (!types.isEmpty() && !types.contains(planet.getTypeId())) continue;
+                MarketAPI market = planet.getMarket();
+                if (market == null || !market.isPlanetConditionMarketOnly()) continue;
+                if (planet.hasTag(Tags.NOT_RANDOM_MISSION_TARGET) || planet.hasTag(Tags.MISSION_ITEM)) continue;
+                MemoryAPI memory = planet.getMemoryWithoutUpdate();
+                if (memory.getBoolean("$aotd_mega_already") || memory.contains("$IndEvo_ArtilleryStation")) continue;
+                return planet;
             }
         }
         return null;
     }
 
+    private List<StarSystemAPI> getMegastructureSystems(List<StarSystemAPI> availableSystems) {
+        List<StarSystemAPI> systems = new ArrayList<>();
+        for (StarSystemAPI system : availableSystems) {
+            if (isSuitableMegastructureSystem(system)) systems.add(system);
+        }
+        Collections.shuffle(systems, Misc.random);
+        systems.sort(Comparator.comparing(this::hasMegastructure));
+        return systems;
+    }
+
+    private boolean isSuitableMegastructureSystem(StarSystemAPI system) {
+        return system.getStar() != null && system.getCenter() != null && !system.hasPulsar() && !system.isNebula()
+                && !system.hasTag(Tags.THEME_CORE) && !system.hasTag(Tags.THEME_CORE_POPULATED)
+                && !system.hasTag(Tags.THEME_CORE_UNPOPULATED) && !system.hasTag(Tags.THEME_HIDDEN)
+                && !system.hasTag(Tags.SYSTEM_CUT_OFF_FROM_HYPER);
+    }
+
+    private boolean hasMegastructure(StarSystemAPI system) {
+        return system.getCustomEntities().stream().anyMatch(entity -> Entities.CORONAL_TAP.equals(entity.getCustomEntityType()))
+                || system.getPlanets().stream().anyMatch(planet -> planet.getMemoryWithoutUpdate().getBoolean("$aotd_mega_already")
+                || !BaseMegastructureScript.getAllMegasFromEntity(planet).isEmpty());
+    }
+
+    private StarSystemAPI getFallbackSystem(List<StarSystemAPI> availableSystems) {
+        for (StarSystemAPI system : getMegastructureSystems(availableSystems)) {
+            String starType = system.getStar().getSpec().getPlanetType();
+            if (Global.getSettings().getSpec(StarGenDataSpec.class, starType, false) != null) return system;
+        }
+        return null;
+    }
+
+    private PlanetAPI spawnFallbackPlanet(List<StarSystemAPI> preferredSystems, String name, String type) {
+        StarSystemAPI system = getFallbackSystem(preferredSystems);
+        if (system == null) system = getFallbackSystem(Global.getSector().getStarSystems());
+        if (system == null) {
+            Global.getLogger(AoTDDataInserter.class).warn("No suitable star system found for " + name);
+            return null;
+        }
+
+        PlanetGenDataSpec spec = (PlanetGenDataSpec) Global.getSettings().getSpec(PlanetGenDataSpec.class, type, true);
+        float radius = StarSystemGenerator.getRadius(spec.getMinRadius(), spec.getMaxRadius());
+        float orbitRadius = BaseThemeGenerator.getOuterRadius(system) + radius + StarSystemGenerator.BASE_INCR;
+        Random random = StarSystemGenerator.random;
+        float orbitDays = orbitRadius / (20f + random.nextFloat() * 5f);
+        PlanetAPI planet = system.addPlanet(null, system.getCenter(), name, type, random.nextFloat() * 360f,
+                radius, orbitRadius, orbitDays);
+        StarAge age = system.getAge();
+        PlanetConditionGenerator.generateConditionsForPlanet(planet, age == null || age == StarAge.ANY ? StarAge.AVERAGE : age);
+        return planet;
+    }
+
     public void spawnMegas() {
         ArrayList<StarSystemAPI> hypershuntSystems = AoTDMisc.getStarSystemWithMegastructure("coronal_tap");
-        List<StarSystemAPI> systems = new ArrayList<>();
-        int maxSize = 0;
+        List<StarSystemAPI> systems = List.of();
         for (StarSystemAPI hypershuntSystem : hypershuntSystems) {
-            int size = Misc.getNearbyStarSystems(hypershuntSystem.getCenter(), 10).stream().filter(x -> !x.hasPulsar() && !x.isNebula()).toList().size();
-            if (size > maxSize) {
-                maxSize = size;
-                systems = Misc.getNearbyStarSystems(hypershuntSystem.getCenter(), 10).stream().filter(x -> !x.hasPulsar() && !x.isNebula()).toList();
-            }
+            List<StarSystemAPI> nearby = Misc.getNearbyStarSystems(hypershuntSystem.getCenter(), 10).stream()
+                    .filter(this::isSuitableMegastructureSystem).toList();
+            if (nearby.size() > systems.size()) systems = nearby;
         }
         spawnPluto(systems);
         spawnNidavleir(systems);
@@ -259,19 +378,17 @@ public class AoTDDataInserter {
     }
 
     public void spawnPluto(List<StarSystemAPI> possibleSystems) {
-        PlanetAPI planet = (PlanetAPI) getEntityWithCriteria(possibleSystems, Planets.PLANET_LAVA, Planets.PLANET_LAVA_MINOR);
+        PlanetAPI planet = getEntityWithCriteria(possibleSystems, Planets.PLANET_LAVA, Planets.PLANET_LAVA_MINOR);
         if (planet == null) {
-            planet = (PlanetAPI) getEntityWithCriteria(possibleSystems);
-            StarSystemAPI starSystem = planet.getStarSystem();
-            planet = starSystem.addPlanet(null, starSystem.getStar(), "Pluto", Planets.PLANET_LAVA, 0, 120, 1200, 360);
-
+            planet = spawnFallbackPlanet(possibleSystems, "Pluto", Planets.PLANET_LAVA);
         }
+        if (planet == null) return;
         for (Map.Entry<String, String> entry : ResourceDepositsCondition.COMMODITY.entrySet()) {
             if (entry.getValue().equals(Commodities.RARE_ORE) || entry.getValue().equals(Commodities.ORE)) {
                 planet.getMarket().removeCondition(entry.getKey());
             }
         }
-        planet.getMarket().addCondition(Conditions.VERY_HOT);
+        if (!planet.hasCondition(Conditions.VERY_HOT)) planet.getMarket().addCondition(Conditions.VERY_HOT);
         planet.getMarket().removeCondition(Conditions.HOT);
         planet.getMarket().removeCondition(Conditions.COLD);
         planet.getMarket().removeCondition(Conditions.VERY_COLD);
