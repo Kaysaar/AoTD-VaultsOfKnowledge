@@ -75,7 +75,7 @@ public class BlackSiteProjectManager {
 
     public void setCurrentlyOnGoingProject(AoTDSpecialProject currentlyOnGoingProject) {
         if(currentlyOnGoingProject==null){
-            if(this.currentlyOnGoingProject!=null){
+            if(this.currentlyOnGoingProject!=null && contract!=null){
                 AoTDTradeContractManager.getInstance().terminateContract(getContract().getId());
                 contract = null;
 

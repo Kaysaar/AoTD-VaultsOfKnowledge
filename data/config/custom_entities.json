@@ -78,7 +78,7 @@
 		"customDescriptionId":"aotd_hyperspace_scanner",
 		"interactionImage":"graphics/illustrations/aotd_hyperspace_scanner_gas.png",
 		"tags":["aotd_hyperspace_scanner", "neutrino_high", "objective"],
-		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"layers":[STATIONS, BELOW_STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
 		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.HyperspaceScannerEntityPlugin",
 	},
 	"aotd_hypershunt_receiver":{
@@ -95,7 +95,7 @@
 		"customDescriptionId":"aotd_hypershunt_receiver",
 		"interactionImage":"graphics/illustrations/hypershunt_reciver.png",
 		"tags":["aotd_hypershunt_receiver", "neutrino_high", "objective"],
-		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"layers":[STATIONS, BELOW_STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
 		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.HypershuntReceiverEntityPlugin",
 	},
 	"aotd_crystal_casino":{
@@ -113,7 +113,7 @@
 		"customDescriptionId":"aotd_crystal_casino",
 		"interactionImage":"graphics/illustrations/aotd_crystal_casino.png",
 		"tags":["aotd_crystal_casino", "neutrino_high", "objective"],
-		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"layers":[STATIONS, BELOW_STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
 		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.CrystalCasinoEntityPlugin",
 	},
 	"aotd_gnajid_station":{
@@ -131,8 +131,26 @@
 		"customDescriptionId":"aotd_gnajid_station",
 		"interactionImage":"graphics/illustrations/aotd_gnajid.png",
 		"tags":["aotd_gnajid_station", "neutrino_high", "objective"],
-		"layers":[STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
+		"layers":[STATIONS, BELOW_STATIONS], # what layer(s) to render in. See CampaignEngineLayers.java for possible values
 		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.NotDijangEntityPlugin",
+	},
+	"aotd_abyssal_lighthouse":{
+		"baseId":"base_campaign_objective",
+		"defaultRadius":120,
+		"defaultName":"Abyssal Lighthouse",
+		"nameInText":"abyssal lighthouse",
+		"shortName":"lighthouse",
+		"icon":"graphics/icons/aotd_abyssal_lighthouse_icon.png",
+		"iconWidth":24,
+		"iconHeight":24,
+		"sprite":"graphics/stations/aotd_abyssal_lighthouse.png",
+		"spriteWidth":71.00377,
+		"spriteHeight":192,
+		"customDescriptionId":"aotd_abyssal_lighthouse",
+		"interactionImage":"graphics/illustrations/abyssal_light.jpg",
+		"tags":["aotd_abyssal_lighthouse", "neutrino_high", "objective"],
+		"layers":[STATIONS, BELOW_STATIONS],
+		"pluginClass":"com.fs.starfarer.api.impl.campaign.aotd_entities.AbyssalLighthouseEntityPlugin",
 	},
 	"nid_shipyards":{
 		"defaultName":"Nid Shipyards", # used if name=null in addCustomEntity()

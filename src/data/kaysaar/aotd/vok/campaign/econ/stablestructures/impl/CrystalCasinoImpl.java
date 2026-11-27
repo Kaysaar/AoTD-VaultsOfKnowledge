@@ -17,7 +17,6 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureImpl;
 import data.kaysaar.aotd.tot.ui.commoditypanel.AoTDCommodityShortPanelCombined;
-import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureSpecManager;
 import data.kaysaar.aotd.tot.ui.starsystems.stuctures.map.StructureLocationPicker;
 import data.kaysaar.aotd.vok.campaign.econ.industry.CrystalCasinoPlanetaryIndustry;
 import data.kaysaar.aotd.vok.campaign.econ.stablestructures.ui.CrystalCasinoPlanetPicker;
@@ -67,17 +66,7 @@ public class CrystalCasinoImpl extends AoTDStableStructureImpl {
     }
 
     public boolean hasAnotherCasino(FactionAPI faction) {
-        if (faction == null) return false;
-        for (StarSystemAPI system : Global.getSector().getStarSystems()) {
-            for (SectorEntityToken token : system.getAllEntities()) {
-                if (token == currentlyAssignedToken || token.isExpired() || token.getFaction() == null
-                        || !faction.getId().equals(token.getFaction().getId())) continue;
-                Object value = token.getMemoryWithoutUpdate().get(AoTDStableStructureSpecManager.memKeyInEntities);
-                if (value instanceof CrystalCasinoImpl && CASINO_ID.equals(((CrystalCasinoImpl) value).id)) return true;
-                if (CASINO_ID.equals(token.getCustomEntityType())) return true;
-            }
-        }
-        return false;
+        return faction != null && hasAnotherStructure(CASINO_ID, faction);
     }
 
     public boolean canBuildOnPlanet(PlanetAPI planet) {

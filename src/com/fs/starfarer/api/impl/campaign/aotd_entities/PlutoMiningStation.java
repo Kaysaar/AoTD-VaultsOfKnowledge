@@ -10,6 +10,7 @@ import com.fs.starfarer.api.util.Misc;
 
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.PlutoMegastructure;
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.models.BaseMegastructureScript;
+import data.kaysaar.aotd.vok.misc.AoTDMisc;
 import org.lwjgl.util.vector.Vector2f;
 import org.shmo.lib.aotd.campaign.api.*;
 import org.shmo.lib.aotd.campaign.impl.BaseShmoStateScript;
@@ -43,6 +44,7 @@ public class PlutoMiningStation extends BaseCustomEntityPlugin {
     }
 
     private transient ShmoCustomLaserSpec laserSpec = null;
+    private transient boolean shadowSized;
 
     private ShmoCustomLaser laser = null;
     private ShmoStateMachine stateMachine = null;
@@ -237,7 +239,6 @@ public class PlutoMiningStation extends BaseCustomEntityPlugin {
 
     @Override
     public void render(CampaignEngineLayers layer, ViewportAPI viewport) {
-
         if (layer.equals(CampaignEngineLayers.STATIONS)) {
             final SpriteAPI plutoGeneralGlow = Global.getSettings().getSprite("rendering", "aotd_pluto_general_glow");
             final SpriteAPI plutoLaserGlow = Global.getSettings().getSprite("rendering", "aotd_pluto_laser_glow");
@@ -282,6 +283,7 @@ public class PlutoMiningStation extends BaseCustomEntityPlugin {
         }
 
         if (layer.equals(CampaignEngineLayers.BELOW_STATIONS)) {
+            if (!shadowSized) shadowSized = AoTDMisc.sizeStationShadow(entity);
             renderLaser();
             renderLaserContactGlow();
         }

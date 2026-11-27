@@ -9,13 +9,17 @@ import com.fs.starfarer.api.campaign.PersistentUIDataAPI;
 import com.fs.starfarer.api.fleet.FleetMemberViewAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Abilities;
 import com.fs.starfarer.api.impl.campaign.rulecmd.AddAbility;
+import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin;
 import com.fs.starfarer.api.util.Misc;
+import data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.AbyssalLighthouseField;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AoTDFuelConsumptionScript implements EveryFrameScript {
+    private transient HyperspaceTerrainPlugin hyperspaceTerrain;
+
     @Override
     public boolean isDone() {
         return false;
@@ -65,9 +69,12 @@ public class AoTDFuelConsumptionScript implements EveryFrameScript {
     }
     public void trueAdvance(float amount) {
         CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
+        boolean compoundActive = false;
+        fleet.getStats().getFleetwideMaxBurnMod().unmodifyMult("aotd_compound");
         if(getCompound(fleet.getCargo())>0){
             addAbility("aotd_compound_toggle");
             if(Global.getSector().getPlayerMemoryWithoutUpdate().is(AoTDCompoundShowcase.memKey,true)){
+                compoundActive = true;
 
                 fleet.getStats().getFuelUseHyperMult().modifyMult("aotd_compound",0.1f,"Compound");
                 float fuelConsumed = getComputedFuel(amount,fleet);
@@ -83,42 +90,21 @@ public class AoTDFuelConsumptionScript implements EveryFrameScript {
                         //view.getEngineHeightMult().shift(getModId(), 5f, 1f, 1f, 1f);
                         //view.getEngineWidthMult().shift(getModId(), 10f, 1f, 1f, 1f);
                     }
-                    if(fleet.getStats().getFleetwideMaxBurnMod().getMultBonus("hyperspace_stat_mod_5")!=null){
-                        // 2 IS max while 1 is min
-                        fleet.getStats().getFleetwideMaxBurnMod().modifyMult("aotd_compound",closenessToOne(fleet.getStats().getFleetwideMaxBurnMod().getMultBonus("hyperspace_stat_mod_5").getValue()),"Compound infusion (Abyssal Hyperspace");
-
-                    }
-                    else{
-                        fleet.getStats().getFleetwideMaxBurnMod().unmodifyMult("aotd_compound");
-
-                    }
                 }
                 fleet.getCargo().removeCommodity("compound",fuelConsumed);
 
             }
             else {
-                fleet.getStats().getFleetwideMaxBurnMod().unmodifyMult("aotd_compound");
-
                 fleet.getStats().getFuelUseHyperMult().unmodifyMult("aotd_compound");
             }
         }
 
         else{
-            fleet.getStats().getFleetwideMaxBurnMod().unmodifyMult("aotd_compound");
-
             fleet.getStats().getFuelUseHyperMult().unmodifyMult("aotd_compound");
 
         }
-
-
-
-    }
-    public  float closenessToOne(double num) {
-        if (num < 0 || num > 1) {
-           return 1f;
-        }
-        if (num == 1) return 1;
-        return (float) (1f / num)*0.5f;
+        if (hyperspaceTerrain == null) hyperspaceTerrain = Misc.getHyperspaceTerrainPlugin();
+        if (hyperspaceTerrain != null) AbyssalLighthouseField.applyPenaltyReductions(fleet, compoundActive, hyperspaceTerrain);
     }
 
     public float getComputedFuel(float amount,CampaignFleetAPI fleet){

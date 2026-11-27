@@ -4,6 +4,7 @@ import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.BasePopUpDialog;
 import ashlib.data.plugins.ui.models.InstantPopUpUI;
 import ashlib.data.plugins.ui.models.PopUpUI;
+import com.fs.graphics.Sprite;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
@@ -47,6 +48,13 @@ import java.util.*;
 
 
 public class AoTDMisc {
+    public static boolean sizeStationShadow(SectorEntityToken entity) {
+        if (!(ReflectionUtilis.getPrivateVariable("shadowMask", entity) instanceof Sprite mask)) return false;
+        float size = Math.max(mask.getWidth(), mask.getHeight());
+        mask.setSize(size, size);
+        return true;
+    }
+
     public static int getMonthsRemaining(float daysLeft) {
         if (daysLeft <= 0f) return 0;
 

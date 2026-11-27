@@ -94,6 +94,7 @@ import data.kaysaar.aotd.vok.timeline.research.JanusDeviceEvent;
 import data.kaysaar.aotd.vok.timeline.research.ResearchFacilityEvent;
 import data.kaysaar.aotd.vok.timeline.research.MacroIndustrialComplexResearch;
 import data.kaysaar.aotd.vok.timeline.research.StreamlinedProductionResearch;
+import data.kaysaar.aotd.vok.timeline.templates.FirstSystemStructureEvent;
 import data.kaysaar.aotd.vok.timeline.templates.SpecialProjectCompletionEvent;
 import data.kaysaar.aotd.vok.timeline.unique.BifrostNetworkEstablished;
 import data.kaysaar.aotd.vok.timeline.unique.HyperdimensionalProcessorEvent;
@@ -115,6 +116,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 
 public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextListenerInjector {
@@ -775,6 +777,10 @@ public class AoTDVokModPlugin extends BaseModPlugin implements MarketContextList
 
     public void addEvents() {
         TimelineListenerManager manager = TimelineListenerManager.getInstance();
+        for (String structureId : List.of("aotd_abyssal_lighthouse", "aotd_gnajid_station",
+                "aotd_hypershunt_receiver", "aotd_crystal_casino")) {
+            manager.addNewListener(new MiscEventListener(new FirstSystemStructureEvent(structureId)));
+        }
         BlackSiteProjectManager.getInstance().getProjects().values().forEach(x -> manager.addNewListener(new MiscEventListener(AoTDMemFlags.RESEARCH_PROJECT_EVENT, new SpecialProjectCompletionEvent(x.getProjectSpec().getId()))));
         TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDMemFlags.MEGASTRUCTURE_FLAG_DISCOVERY, new BifrostNetworkEstablished()));
         TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.FIRST_ITEM, new HyperdimensionalProcessorEvent()));

@@ -8,6 +8,7 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.PlayerColonizationListener;
 import com.fs.starfarer.api.combat.StatBonus;
+import com.fs.starfarer.api.impl.campaign.DebugFlags;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.plugins.SurveyPlugin;
@@ -58,21 +59,25 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
 
     @Override
     public boolean doesMeetAdditionalCriteriaForDevelopment(MarketAPI market) {
-        if (!(market.getPrimaryEntity() instanceof PlanetAPI planet)) return false;
-        CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
-        CargoAPI cargo = fleet.getCargo();
-        SurveyPlugin survey = (SurveyPlugin) Global.getSettings().getNewPluginInstance("surveyPlugin");
-        survey.init(fleet, planet);
-        Map<String, Integer> totalCosts = new LinkedHashMap<>(COLONIZATION_COSTS);
-        survey.getOutpostConsumed().forEach((id, amount) -> totalCosts.merge(id, amount, Integer::sum));
-        return totalCosts.entrySet().stream()
+        if (!(market.getPrimaryEntity() instanceof PlanetAPI)) return false;
+        CargoAPI cargo = Global.getSector().getPlayerFleet().getCargo();
+        return COLONIZATION_COSTS.entrySet().stream()
                 .allMatch(cost -> cargo.getCommodityQuantity(cost.getKey()) >= cost.getValue());
     }
 
     @Override
     public void executePlanBeforeColonization(MarketAPI market) {
-        CargoAPI cargo = Global.getSector().getPlayerFleet().getCargo();
-        COLONIZATION_COSTS.forEach(cargo::removeCommodity);
+        CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
+        Map<String, Integer> outpostCosts = Map.of();
+        if (!DebugFlags.COLONY_DEBUG) {
+            SurveyPlugin survey = (SurveyPlugin) Global.getSettings().getNewPluginInstance("surveyPlugin");
+            survey.init(fleet, (PlanetAPI) market.getPrimaryEntity());
+            outpostCosts = survey.getOutpostConsumed();
+        }
+        for (Map.Entry<String, Integer> cost : COLONIZATION_COSTS.entrySet()) {
+            int remaining = cost.getValue() - outpostCosts.getOrDefault(cost.getKey(), 0);
+            if (remaining > 0) fleet.getCargo().removeCommodity(cost.getKey(), remaining);
+        }
     }
 
     @Override
@@ -242,7 +247,7 @@ public class AbyssalFrontier extends BaseColonyDevelopment implements PlayerColo
                 "Tenebrium production"
         );
         if (!forMarketCondition) {
-            tooltip.addSectionHeading("Additional Cost For Colonization (Available)", Alignment.MID,5f);
+            tooltip.addSectionHeading("Total Colonization Cost (Available)", Alignment.MID,5f);
             tooltip.addCustom(createTooltipOfResourcesForDialogConsumed(tooltip.getWidthSoFar()-10,45,45,COLONIZATION_COSTS,false),5f);
         }
     }

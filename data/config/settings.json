@@ -197,6 +197,7 @@
 		},
 		"rendering":{
             "GlitchSquare":"graphics/fx/solid_square.png",
+			"aotd_crystal_casino_glow":"graphics/fx/aotd_crystal_casino_glow.png",
 			"aotd_pluto_general_glow":"graphics/fx/aotd_pluto_general_glow.png",
 			"aotd_pluto_laser_glow_white":"graphics/fx/aotd_pluto_laser_glow_white.png",
 			"aotd_pluto_laser_glow":"graphics/fx/aotd_pluto_laser_glow.png",

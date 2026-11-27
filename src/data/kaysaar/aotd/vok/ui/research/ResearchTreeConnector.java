@@ -17,14 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-/**
- * Draws non-overlapping prerequisite connections between research cards.
- *
- * Routes are calculated once, at construction. Straight horizontal connections
- * are reserved first; subsequent connections cannot cross or approach already
- * reserved strokes. Corners are chamfered before their geometry is reserved.
- * Zooming only transforms the finished paths into screen coordinates.
- */
 public class ResearchTreeConnector extends ResizableComponent {
 
     // Card and rendering dimensions.
@@ -39,6 +31,7 @@ public class ResearchTreeConnector extends ResizableComponent {
     private static final float CARD_INTERIOR_INSET = 0.35f;
     private static final float CARD_CLEARANCE = 12f;
     private static final float MIN_WIRE_SEPARATION = 12f;
+    private static final float COMPACT_WIRE_SEPARATION = 3f;
     private static final float PORT_STUB = 22f;
     private static final float MAX_DIAGONAL_RISE = 140f;
     private static final float CHAMFER_SIZE = 9f;
@@ -47,6 +40,7 @@ public class ResearchTreeConnector extends ResizableComponent {
     // Port placement and candidate search.
     private static final float MAX_PORT_SPACING = 16f;
     private static final float PORT_SPREAD = 92f;
+    private static final int DENSE_PORT_COUNT = 6;
     private static final float PORT_ALIGNMENT_EPSILON = 0.01f;
     private static final float MIN_DIAGONAL_RISE = 0.5f;
     private static final int DIAGONAL_SAMPLES = 9;
@@ -98,6 +92,7 @@ public class ResearchTreeConnector extends ResizableComponent {
     private final List<Node> nodes = new ArrayList<>();
     private final List<Edge> edges = new ArrayList<>();
     private final List<Line> reservedLines = new ArrayList<>();
+    private float wireSeparation = MIN_WIRE_SEPARATION;
 
     public ResearchTreeConnector(ResearchZoomPanel tree, Map<ResearchPanelComponent, float[]> nodePositions) {
         this.tree = tree;
@@ -192,11 +187,12 @@ public class ResearchTreeConnector extends ResizableComponent {
 
         float spacing = Math.min(MAX_PORT_SPACING,
                 PORT_SPREAD / Math.max(1, connected.size() - 1));
+        float portLimit = CARD_HEIGHT * 0.5f - CARD_CLEARANCE;
+        float middle = alignedIndex >= 0 ? alignedIndex : (connected.size() - 1) * 0.5f;
+        float spacingAbove = Math.min(spacing, portLimit / Math.max(1f, middle));
+        float spacingBelow = Math.min(spacing, portLimit / Math.max(1f, connected.size() - 1 - middle));
         for (int i = 0; i < connected.size(); i++) {
-            // An aligned connection keeps the center port; its siblings fan around it.
-            float offset = alignedIndex >= 0
-                    ? (i - alignedIndex) * spacing
-                    : (i - (connected.size() - 1) / 2f) * spacing;
+            float offset = (i - middle) * (i < middle ? spacingAbove : spacingBelow);
 
             if (outgoing) connected.get(i).startY = node.centerY() + offset;
             else connected.get(i).endY = node.centerY() + offset;
@@ -210,18 +206,29 @@ public class ResearchTreeConnector extends ResizableComponent {
                 .thenComparing(edge -> edge.parent.id())
                 .thenComparing(edge -> edge.child.id()));
 
+        for (Edge edge : edges) routeAndReserve(edge);
+        wireSeparation = COMPACT_WIRE_SEPARATION;
         for (Edge edge : edges) {
-            route(edge);
-            if (edge.path.size() < 2) {
-                // Fixed positions can make a planar route impossible. Never draw an overlap.
-                System.err.println("VoK tech tree: no disjoint connector route: "
-                        + edge.parent.id() + " -> " + edge.child.id());
-                continue;
-            }
+            if (!edge.drawPath.isEmpty()) continue;
 
-            edge.drawPath.addAll(beveled(edge.path));
-            reserve(edge.drawPath);
+            routeAndReserve(edge);
+            if (edge.drawPath.isEmpty()) {
+                System.err.println("VoK tech tree: no connector route: "
+                        + edge.parent.id() + " -> " + edge.child.id());
+            }
         }
+    }
+
+    private void routeAndReserve(Edge edge) {
+        route(edge);
+        if (edge.path.size() < 2) return;
+
+        edge.drawPath.addAll(beveled(edge.path));
+        reserve(edge.drawPath);
+    }
+
+    private static boolean hasDensePorts(Edge edge) {
+        return edge.parent.outgoing.size() > DENSE_PORT_COUNT || edge.child.incoming.size() > DENSE_PORT_COUNT;
     }
 
     private boolean isDirectHorizontal(Edge edge) {
@@ -244,6 +251,12 @@ public class ResearchTreeConnector extends ResizableComponent {
         float top = Math.max(edge.parent.y, edge.child.y) + CARD_INTERIOR_INSET;
         float bottom = Math.min(edge.parent.bottom(), edge.child.bottom()) - CARD_INTERIOR_INSET;
         if (top >= bottom) return levels;
+        if (hasDensePorts(edge)) {
+            if (Math.abs(edge.startY - edge.endY) < POINT_EPSILON) {
+                addHorizontalLevel(levels, edge.startY, top, bottom);
+            }
+            return levels;
+        }
 
         float centerParent = edge.parent.centerY();
         float centerChild = edge.child.centerY();
@@ -319,15 +332,6 @@ public class ResearchTreeConnector extends ResizableComponent {
         }
     }
 
-    /**
-     * A grid detour can finish on a nearby horizontal lane, then make a tiny
-     * vertical correction immediately before the destination card. If that
-     * lane is a legal destination port, move the port onto the lane instead
-     * of drawing a small staircase at the edge of the card.
-     *
-     * This is checked against every card and previously reserved connector,
-     * so removing the jog never bypasses the router's collision constraints.
-     */
     private Candidate straightenFinalApproach(Candidate route, Edge edge) {
         List<Point> points = route.points;
         if (points.size() < 4) return route;
@@ -347,6 +351,15 @@ public class ResearchTreeConnector extends ResizableComponent {
         float adjustment = Math.abs(end.y - laneEnd.y);
         if (adjustment <= POINT_EPSILON || adjustment > GRID_SIZE) return route;
 
+        if (last >= 4 && Math.abs(points.get(last - 4).x - laneStart.x) < POINT_EPSILON) {
+            List<Point> direct = new ArrayList<>(points.subList(0, last - 3));
+            direct.add(new Point(laneStart.x, end.y));
+            direct.add(end);
+            Candidate candidate = consider(null, direct, edge);
+            if (candidate != null) return candidate;
+        }
+
+        if (hasDensePorts(edge)) return route;
         float alignedY = laneEnd.y;
         if (alignedY <= edge.child.y + CARD_INTERIOR_INSET
                 || alignedY >= edge.child.bottom() - CARD_INTERIOR_INSET) {
@@ -410,10 +423,31 @@ public class ResearchTreeConnector extends ResizableComponent {
     }
 
     private Candidate tryTrunkRoutes(Candidate best, Point from, Point to, Edge edge) {
-        List<Float> xs = xTracks(from.x + PORT_STUB, to.x - PORT_STUB);
+        float leftLimit = from.x + PORT_STUB;
+        float rightLimit = to.x - PORT_STUB;
+        boolean outgoing = edge.parent.outgoing.size() >= edge.child.incoming.size();
+        List<Edge> fan = outgoing ? edge.parent.outgoing : edge.child.incoming;
+        int samples = Math.max(TRACK_SAMPLES, fan.size());
+        if (hasDensePorts(edge)) {
+            float fanLeft = leftLimit;
+            float fanRight = rightLimit;
+            for (Edge sibling : fan) {
+                float siblingLeft = sibling.parent.right() + PORT_STUB;
+                float siblingRight = sibling.child.x - PORT_STUB;
+                if (siblingRight <= siblingLeft) continue;
+                if (outgoing) fanRight = Math.min(fanRight, siblingRight);
+                else fanLeft = Math.max(fanLeft, siblingLeft);
+            }
+            int index = fan.indexOf(edge);
+            int lane = from.y < to.y ? fan.size() - 1 - index : index;
+            float x = fanLeft + (fanRight - fanLeft) * (lane + 0.5f) / fan.size();
+            Candidate ordered = consider(null, singleTrunkPath(from, to, x), edge);
+            if (ordered != null) return ordered;
+        }
+
+        List<Float> xs = xTracks(leftLimit, rightLimit, samples);
         for (float x : xs) {
-            best = consider(best, Arrays.asList(from, new Point(x, from.y),
-                    new Point(x, to.y), to), edge);
+            best = consider(best, singleTrunkPath(from, to, x), edge);
         }
 
         // Two vertical trunks are only considered if all simpler candidates failed.
@@ -427,6 +461,10 @@ public class ResearchTreeConnector extends ResizableComponent {
             }
         }
         return best;
+    }
+
+    private static List<Point> singleTrunkPath(Point from, Point to, float x) {
+        return Arrays.asList(from, new Point(x, from.y), new Point(x, to.y), to);
     }
 
     private Candidate tryShortDistanceBypasses(Point from, Point to, Edge edge) {
@@ -457,13 +495,13 @@ public class ResearchTreeConnector extends ResizableComponent {
                 new Point(right, y), new Point(right, to.y), to);
     }
 
-    private List<Float> xTracks(float left, float right) {
+    private List<Float> xTracks(float left, float right, int samples) {
         List<Float> tracks = new ArrayList<>();
         if (right < left) return tracks;
 
         tracks.add((left + right) * 0.5f);
-        for (int i = 0; i < TRACK_SAMPLES; i++) {
-            tracks.add(left + (right - left) * (i + 0.5f) / TRACK_SAMPLES);
+        for (int i = 0; i < samples; i++) {
+            tracks.add(left + (right - left) * (i + 0.5f) / samples);
         }
         for (Node node : nodes) {
             addIfBetween(tracks, node.x - CARD_CLEARANCE - TRACK_CARD_MARGIN, left, right);
@@ -545,6 +583,8 @@ public class ResearchTreeConnector extends ResizableComponent {
         Point end = path.get(path.size() - 1);
         if (Math.abs(start.x - edge.parent.right()) > ENDPOINT_EPSILON
                 || Math.abs(end.x - edge.child.x) > ENDPOINT_EPSILON) return false;
+        if (start.y <= edge.parent.y || start.y >= edge.parent.bottom()
+                || end.y <= edge.child.y || end.y >= edge.child.bottom()) return false;
         if (second.x < start.x + DIRECTION_EPSILON
                 || beforeEnd.x > end.x - DIRECTION_EPSILON) return false;
 
@@ -657,9 +697,9 @@ public class ResearchTreeConnector extends ResizableComponent {
         return false;
     }
 
-    private static boolean segmentsTooClose(Point a, Point b, Point c, Point d) {
+    private boolean segmentsTooClose(Point a, Point b, Point c, Point d) {
         if (intersectsInclusive(a, b, c, d)) return true;
-        float minDistanceSquared = MIN_WIRE_SEPARATION * MIN_WIRE_SEPARATION;
+        float minDistanceSquared = wireSeparation * wireSeparation;
         float closestSquared = Math.min(
                 Math.min(pointSegmentDistanceSquared(a, c, d),
                         pointSegmentDistanceSquared(b, c, d)),
@@ -893,45 +933,15 @@ public class ResearchTreeConnector extends ResizableComponent {
         PositionAPI target = edge.child.panel.getComponentPanel().getPosition();
         float sourceX = source.getX() + source.getWidth();
         float targetX = target.getX();
-        float sourceY = source.getCenterY()
-                - (edge.startY - edge.parent.centerY()) * zoom;
-        float targetY = target.getCenterY()
-                - (edge.endY - edge.child.centerY()) * zoom;
-
-        // Era panels and their child cards are rounded to whole pixels during
-        // resize. A world-space vertex between two actual card anchors can
-        // therefore sit a few pixels above/below them. Render a straight
-        // connection as ONE horizontal screen-space segment, with no final jog.
-        if (path.size() == 2 && Math.abs(path.get(0).y - path.get(1).y) < POINT_EPSILON) {
-            float y = (sourceY + targetY) * 0.5f;
-            GL11.glBegin(GL11.GL_LINES);
-            GL11.glVertex2f(sourceX, y);
-            GL11.glVertex2f(targetX, y);
-            GL11.glEnd();
-            return;
-        }
+        int last = path.size() - 1;
 
         GL11.glBegin(GL11.GL_LINE_STRIP);
-        for (int i = 0; i < path.size(); i++) {
-            if (i == 0) {
-                GL11.glVertex2f(sourceX, sourceY);
-            } else if (i == path.size() - 1) {
-                GL11.glVertex2f(targetX, targetY);
-            } else {
-                Point point = path.get(i);
-                float screenY = originY - point.y * zoom;
-
-                // The final approach must remain horizontal after pixel
-                // rounding, just as the route geometry intended.
-                if (i == 1 && Math.abs(point.y - path.get(0).y) < POINT_EPSILON) {
-                    screenY = sourceY;
-                }
-                if (i == path.size() - 2
-                        && Math.abs(point.y - path.get(path.size() - 1).y) < POINT_EPSILON) {
-                    screenY = targetY;
-                }
-                GL11.glVertex2f(originX + point.x * zoom, screenY);
-            }
+        for (int i = 0; i <= last; i++) {
+            Point point = path.get(i);
+            float x = originX + point.x * zoom;
+            if (i == 0) x = sourceX;
+            else if (i == last) x = targetX;
+            GL11.glVertex2f(x, originY - point.y * zoom);
         }
         GL11.glEnd();
     }

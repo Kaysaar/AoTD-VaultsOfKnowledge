@@ -238,19 +238,30 @@ public class AoTDSpecialProject {
             }
         }
         if(getTotalProgress()==1f&&!wasCompleted){
-            wasCompleted = true;
-            countOfCompletion++;
-
-            Object reward = grantReward();
-            Global.getSector().getListenerManager().getListeners(SpecialProjectCompletionListener.class).forEach(x->x.completedProject(this.specID,reward));
-            sentFinishNotification();
-            projectCompleted();
+            finishProject();
             forNotifitcations.clear();
-            BlackSiteProjectManager.getInstance().setCurrentlyOnGoingProject(null);
         }
         forNotifitcations.forEach(x->Global.getSector().getIntelManager().addIntel(new ProjectStageCompletionIntel(this,getStage(x))));
         forNotifitcations.clear();
     }
+    public void finishProject() {
+        if (wasCompleted) return;
+        setWasEverDiscovered(true);
+        for (AoTDSpecialProjectStage stage : stages) {
+            stage.setProgress(stage.getSpec().getDays());
+            stage.setCompleted(true);
+        }
+        currentlyAttemptedStages.clear();
+        wasCompleted = true;
+        countOfCompletion++;
+        Object reward = grantReward();
+        Global.getSector().getListenerManager().getListeners(SpecialProjectCompletionListener.class).forEach(x -> x.completedProject(specID, reward));
+        sentFinishNotification();
+        projectCompleted();
+        BlackSiteProjectManager manager = BlackSiteProjectManager.getInstance();
+        if (manager.isCurrentOnGoing(this)) manager.setCurrentlyOnGoingProject(null);
+    }
+
     public boolean canDoProject(){
         return countOfCompletion==0||getProjectSpec().hasTag("repeatable");
     }

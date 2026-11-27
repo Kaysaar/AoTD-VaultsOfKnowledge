@@ -2,4 +2,7 @@ command,class,tags,syntax,help
 research_tech,data.console.ResearchTechnology,"campaign, aotd",research_tech <tech_id>,(AoTD VoK) Researches the specified tech by id
 research_all_technologies,data.console.ResearchAllTechnologies,"campaign, aotd",research_all,(AoTD VoK) Researches all technologies
 unlock_special_projects,data.console.UnlockAllProjects,"campaign, aotd",unlock_special_projects,(AoTD VoK) Unlocks all special projects
+addSystemStructure,data.console.AddSystemStructure,"campaign, aotd",addSystemStructure <structure_id>,(AoTD VoK) Instantly places a player-owned system structure near your fleet for free. Orbit the intended host before using.
+finish_current_bs_project,data.console.FinishSpecialProject,"campaign, aotd",finish_current_bs_project,(AoTD VoK) Finishes the active Black Site project and grants its normal rewards.
+finish_all_bs_projects,data.console.FinishAllBSProjects,"campaign, aotd",finish_all_bs_projects,(AoTD VoK) Finishes outstanding Black Site projects and grants their normal rewards.
 ,,,,

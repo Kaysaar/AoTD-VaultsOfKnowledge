@@ -1,10 +1,12 @@
 package com.fs.starfarer.api.impl.campaign.aotd_entities;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignEngineLayers;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.MutableCommodityQuantity;
 import com.fs.starfarer.api.combat.MutableStat;
+import com.fs.starfarer.api.combat.ViewportAPI;
 import com.fs.starfarer.api.impl.campaign.BaseCampaignObjectivePlugin;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
@@ -16,6 +18,7 @@ import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureImpl;
 import data.kaysaar.aotd.tot.stablestructures.AoTDStableStructureSpecManager;
 import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.CoronalHypershuntMegastructure;
 import data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.HypershuntReciverImpl;
+import data.kaysaar.aotd.vok.misc.AoTDMisc;
 
 import java.util.Map;
 
@@ -28,6 +31,13 @@ public class HypershuntReceiverEntityPlugin extends BaseCampaignObjectivePlugin 
     private transient float refreshDays = REFRESH_INTERVAL_DAYS;
     private transient boolean connected;
     private transient int activeCoreTier;
+    private transient boolean shadowSized;
+
+    @Override
+    public void render(CampaignEngineLayers layer, ViewportAPI viewport) {
+        if (!shadowSized && layer == CampaignEngineLayers.BELOW_STATIONS) shadowSized = AoTDMisc.sizeStationShadow(entity);
+    }
+
     @Override
     public void advance(float amount) {
         if (entity == null || Global.getSector() == null || Global.getSector().isPaused()) return;

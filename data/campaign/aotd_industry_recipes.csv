@@ -12,3 +12,4 @@ aotd_elysian_domain_cultivation,Domain-Grade Elysian Cultivation,aotd_garden_of_
 aotd_megaport_compound_refuelling,Compound-Assisted Refuelling,megaport,data.kaysaar.aotd.vok.campaign.econ.recipes.CompoundRefuellingRecipe
 aotd_daedalus_compound_refuelling,Compound-Assisted Orbital Refuelling,aotd_daedalus_array,data.kaysaar.aotd.vok.campaign.econ.recipes.CompoundRefuellingRecipe
 aotd_supertensile_fabrication,Supertensile Spaceframe Fabrication,aotd_spaceframe_foundry,data.kaysaar.aotd.vok.campaign.econ.recipes.SupertensileFabricationRecipe
+aotd_refined_spaceframe_fabrication,Refined Spaceframe Fabrication,aotd_spaceframe_foundry,data.kaysaar.aotd.vok.campaign.econ.recipes.RefinedSpaceframeFabricationRecipe

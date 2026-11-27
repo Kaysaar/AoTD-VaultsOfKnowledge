@@ -5,6 +5,7 @@ import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.MutableStat;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import data.kaysaar.aotd.tot.scripts.trade.AoTDIsolationUtils;
 import data.kaysaar.aotd.vok.Ids.AoTDIndustries;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.AbyssalFrontier;
 import data.kaysaar.aotd.vok.campaign.econ.colonydevelopment.impl.BoreCity;
@@ -19,7 +20,8 @@ public class BMOVoKMultiPurpouseListener implements BuildingMenuListener {
     public HashSet<String> addBuildingsToBeHidden(MarketAPI marketAPI) {
         ColonyDevelopmentCondition development = ColonyDevelopmentManager.getColonyDevelopmentConditionIfPresent(marketAPI);
         if(development!=null){
-            if(development.getIdOfDevelopment().equals("archeosite")){
+            boolean isolatedFrontier = AbyssalFrontier.ID.equals(development.getIdOfDevelopment()) && AoTDIsolationUtils.isIsolated(marketAPI);
+            if(isolatedFrontier || development.getIdOfDevelopment().equals("archeosite")){
                 HashSet<String>set = new HashSet<>();
                 Global.getSettings().getAllIndustrySpecs().forEach(x->{
                     if(!x.hasTag(Industries.TAG_STATION)){
@@ -27,9 +29,13 @@ public class BMOVoKMultiPurpouseListener implements BuildingMenuListener {
                     }
                 });
                 set.remove(AoTDIndustries.RESEARCH_CENTER);
-                set.remove(Industries.TECHMINING);
-                set.remove(Industries.GROUNDDEFENSES);
-                set.remove(Industries.SPACEPORT);
+                if(isolatedFrontier){
+                    set.remove("aotd_gw_construction_site");
+                } else {
+                    set.remove(Industries.TECHMINING);
+                    set.remove(Industries.GROUNDDEFENSES);
+                    set.remove(Industries.SPACEPORT);
+                }
                 return set;
             }
         }

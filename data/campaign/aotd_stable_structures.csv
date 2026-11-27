@@ -3,6 +3,7 @@ aotd_hypershunt_receiver,1700000,60,"aotd_spaceframe_modules:1600,domain_heavy_m
 aotd_gnajid_station,1300000,150,"aotd_spaceframe_modules:4000,domain_heavy_machinery:450,refined_metal:2550",,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.GnajidIndustrialStationImpl,201
 aotd_crystal_casino,900000,120,"aotd_spaceframe_modules:3500,domain_heavy_machinery:150,refined_metal:900",,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.CrystalCasinoImpl,202
 aotd_hyperspace_scanner,850000,90,"aotd_spaceframe_modules:1800,domain_heavy_machinery:300,purified_rare_metal:120",,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.HyperspaceScannerImpl,203
+aotd_abyssal_lighthouse,1700000,150,"aotd_spaceframe_modules:3500,domain_heavy_machinery:450,refined_metal:1950,advanced_components:450,purified_rare_metal:300,aotd_tenebrium:20",,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.AbyssalLighthouseImpl,204
 coronal_tap,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.CoronalHypershuntSystemStructureView,190
 aotd_pluto_station,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.PlutoSystemStructureView,191
 nid_shipyards,0,0,,,data.kaysaar.aotd.vok.campaign.econ.stablestructures.impl.view.NidavelirSystemStructureView,192

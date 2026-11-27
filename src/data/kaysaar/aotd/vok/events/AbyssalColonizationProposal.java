@@ -42,14 +42,15 @@ public class AbyssalColonizationProposal extends AshlibBaseEvent {
     @Override
     public void createTooltipForEvent(TooltipMakerAPI tooltip) {
         tooltip.addPara(
-                "Continued production of Tenebrium has raised the need for efficient exomatter sourcing." +
+                "Continued production of Tenebrium has raised the need for efficient exomatter sourcing. " +
                         "%s is an ideal location for development, as its location at the boundary of abyssal hyperspace allows for easy access to semi-permeable \"realspace\" through which exomatter substrate can be extracted. ",
                 5f, Misc.getHighlightColor(), "Limbo"
         );
         tooltip.addSectionHeading("Effects of Event", Alignment.MID, 5f);
         tooltip.addPara(
-                "You can now colonize Hades. A colony there can build %s, a new Grand Wonder.",
-                10f, Global.getSettings().getFactionSpec(Factions.DWELLER).getBaseUIColor(), "Charon's Ferry"
+                "You can now colonize Hades. A colony there can build %s, a new Grand Wonder. " +
+                        "You can also build an %s in the Limbo system.",
+                10f, Global.getSettings().getFactionSpec(Factions.DWELLER).getBaseUIColor(), "Charon's Ferry", "Abyssal Lighthouse"
         );
     }
     @Override
